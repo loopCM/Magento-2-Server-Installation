@@ -921,32 +921,33 @@ echo
      read -e -p "---> SELECT MAGENTO TO DOWNLOAD 1 OR 2: " -i "2"  MAGE_SEL_VER
 	 MAGE_VER=MAGE_VER_${MAGE_SEL_VER}
 	 echo
-     read -e -p "---> ENTER YOUR DOMAIN NAME (without www.): " -i "myshop.com" MAGE_DOMAIN
-     MAGE_WEB_ROOT_PATH="/home/${MAGE_DOMAIN%%.*}/public_html"
+     read -e -p "---> ENTER YOUR DOMAIN NAME OR IP ADDRESS: " -i "myshop.com" MAGE_DOMAIN
+     read -e -p "---> ENTER MAGENTO / FTP USER NAME: " -i "myshop" MAGE_WEB_USER
+     MAGE_WEB_ROOT_PATH="/home/${MAGE_WEB_USER}/public_html"
      echo
 	 echo "---> MAGENTO ${MAGE_SEL_VER} (${!MAGE_VER})"
 	 echo "---> WILL BE DOWNLOADED TO ${MAGE_WEB_ROOT_PATH}"
      echo
         mkdir -p ${MAGE_WEB_ROOT_PATH} && cd $_
-        useradd -d ${MAGE_WEB_ROOT_PATH%/*} -s /sbin/nologin ${MAGE_DOMAIN%%.*}  >/dev/null 2>&1
+        useradd -d ${MAGE_WEB_ROOT_PATH%/*} -s /sbin/nologin ${MAGE_WEB_USER}  >/dev/null 2>&1
         MAGE_WEB_USER_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1)
-        echo "${MAGE_DOMAIN%%.*}:${MAGE_WEB_USER_PASS}"  | chpasswd  >/dev/null 2>&1
+        echo "${MAGE_WEB_USER}:${MAGE_WEB_USER_PASS}"  | chpasswd  >/dev/null 2>&1
         chmod 711 /home/${MAGE_DOMAIN%%.*}
-        chown -R ${MAGE_DOMAIN%%.*}:${MAGE_DOMAIN%%.*} ${MAGE_WEB_ROOT_PATH%/*}
+        chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH%/*}
         chmod 2770 ${MAGE_WEB_ROOT_PATH}
-        setfacl -Rdm u:${MAGE_DOMAIN%%.*}:rwx,g:${MAGE_DOMAIN%%.*}:rwx,g::rw-,o::- ${MAGE_WEB_ROOT_PATH}
+        setfacl -Rdm u:${MAGE_WEB_USER}:rwx,g:${MAGE_WEB_USER}:rwx,g::rw-,o::- ${MAGE_WEB_ROOT_PATH}
         echo
 		if [ "${MAGE_SEL_VER}" = "1" ]; then
 			echo -n "      DOWNLOADING MAGENTO"
 			long_progress &
 			pid="$!"
-			su ${MAGE_DOMAIN%%.*} -s /bin/bash -c "wget -qO - ${MAGE_TMP_FILE} | tar -xzp --strip-components 1"
+			su ${MAGE_WEB_USER} -s /bin/bash -c "wget -qO - ${MAGE_TMP_FILE} | tar -xzp --strip-components 1"
 			stop_progress "$pid"
         else
 			curl -sS https://getcomposer.org/installer | php >/dev/null 2>&1
 			mv composer.phar /usr/local/bin/composer
 			[ -f "/usr/local/bin/composer" ] || { echo "---> COMPOSER INSTALLATION ERROR" ; exit 1 ;}
-			su ${MAGE_DOMAIN%%.*} -s /bin/bash -c "${REPO_MAGE} ."
+			su ${MAGE_WEB_USER} -s /bin/bash -c "${REPO_MAGE} ."
 		fi
         echo
      echo
@@ -955,7 +956,7 @@ GREENTXT "      == MAGENTO DOWNLOADED AND READY FOR INSTALLATION =="
 WHITETXT "============================================================================="
 mkdir -p /root/mascm/
 cat >> /root/mascm/.mascm_index <<END
-webshop ${MAGE_DOMAIN}    ${MAGE_WEB_ROOT_PATH}    ${MAGE_DOMAIN%%.*}   ${MAGE_WEB_USER_PASS}  ${MAGE_SEL_VER}  ${!MAGE_VER}
+webshop ${MAGE_DOMAIN}    ${MAGE_WEB_ROOT_PATH}    ${MAGE_WEB_USER}   ${MAGE_WEB_USER_PASS}  ${MAGE_SEL_VER}  ${!MAGE_VER}
 END
 echo
 pause '------> Press [Enter] key to show menu'
@@ -1070,7 +1071,7 @@ read -e -p "---> Enter your email: " -i "admin@${MAGE_DOMAIN}"  MAGE_ADMIN_EMAIL
 read -e -p "---> Enter your admins login name: " -i "admin"  MAGE_ADMIN_LOGIN
 MAGE_ADMIN_PASSGEN=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 read -e -p "---> Use generated admin password: " -i "${MAGE_ADMIN_PASSGEN}${RANDOM}"  MAGE_ADMIN_PASS
-read -e -p "---> Enter your shop url: " -i "http://www.${MAGE_DOMAIN}/"  MAGE_SITE_URL
+read -e -p "---> Enter your shop url: " -i "http://${MAGE_DOMAIN}/"  MAGE_SITE_URL
 echo
 WHITETXT "Language, Currency and Timezone settings"
 if [ "${MAGE_SEL_VER}" = "1" ]; then
