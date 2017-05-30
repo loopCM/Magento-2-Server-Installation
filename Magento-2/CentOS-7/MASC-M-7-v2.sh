@@ -1337,13 +1337,13 @@ if [ "${DNS_A_RECORD}" != "${SERVER_IP_ADDR}" ] ; then
     else
     if [ "${MAGE_SEL_VER}" = "1" ]; then
     /usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH} -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}
-    service nginx reload
+    systemctl reload nginx
     else
     /usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}/pub -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}
-    service nginx reload
+    systemctl reload nginx
     fi
  fi
-echo '45 5 * * 1 root /usr/bin/certbot renew --quiet --post-hook "service nginx reload" >> /var/log/letsencrypt-renew.log' >> /etc/crontab
+echo '45 5 * * 1 root /usr/bin/certbot renew --quiet --renew-hook "systemctl reload nginx" >> /var/log/letsencrypt-renew.log' >> /etc/crontab
 echo
 GREENTXT "GENERATE DHPARAM FOR NGINX SSL"
 openssl dhparam -dsaparam -out /etc/ssl/certs/dhparams.pem 4096
