@@ -2,6 +2,13 @@
 
 ### RELEASE-20.5
 
+  * magento 1.9.3.3
+  * separate domaing and linux user name
+  * nginx stronger TLS ciphers. TLSv1 removed
+  * minor code cleanup
+
+### RELEASE-20.5
+
   * wazuh(ossec) 2.0 + ELK 5.3 upgrade
   * ELK Packetbeat monitoring
 
