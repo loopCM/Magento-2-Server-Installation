@@ -3,7 +3,7 @@
 ### RELEASE-20.5.5
 
   * magento 1.9.3.3
-  * separate domaing and linux user name
+  * separate domain and linux user name
   * nginx stronger TLS ciphers. TLSv1 removed
   * minor code cleanup
 
