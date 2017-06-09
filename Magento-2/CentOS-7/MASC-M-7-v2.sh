@@ -1356,6 +1356,8 @@ GREENTXT "SIMPLE LOGROTATE SCRIPT FOR MAGENTO LOGS"
 cat > /etc/logrotate.d/magento <<END
 ${MAGE_WEB_ROOT_PATH}/var/log/*.log
 {
+su root root
+create 640 ${MAGE_WEB_USER} ${MAGE_WEB_USER}
 weekly
 rotate 4
 notifempty
