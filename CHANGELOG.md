@@ -1,5 +1,10 @@
 # Change Log
 
+### RELEASE-20.5.6
+
+  * magento 1.9.3.4
+  * minor code cleanup
+
 ### RELEASE-20.5.5
 
   * magento 1.9.3.3
