@@ -22,6 +22,9 @@ REPO_MAGE="composer create-project --repository-url=https://repo.magento.com/ ma
 
 REPO_MASCM_TMP="https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/tmp/"
 
+# HHVM package
+HHVM_RPM="https://www.dropbox.com/s/cj20m8f1hjqr13r/hhvm-3.20.2-1.x86_64.rpm"
+
 # Webmin Control Panel plugins:
 WEBMIN_NGINX="https://github.com/magenx/webmin-nginx/archive/nginx-0.08.wbm__0.tar.gz"
 WEBMIN_FAIL2BAN="http://download.webmin.com/download/modules/fail2ban.wbm.gz"
@@ -755,21 +758,12 @@ echo -n "---> Start HHVM installation? [y/n][n]:"
 read hhvm_install
 if [ "${hhvm_install}" == "y" ];then
 echo
-cat > /etc/yum.repos.d/gleez.repo <<END
-[gleez]
-name=Gleez repo
-baseurl=https://yum.gleez.com/7/x86_64/
-gpgcheck=0
-enabled=1
-includepkgs=hhvm
-END
-echo
             GREENTXT "Installation of HHVM package:"
             echo
             echo -n "     PROCESSING  "
             start_progress &
             pid="$!"
-            yum -y -q install hhvm >/dev/null 2>&1
+            rpm -i ${HHVM_RPM} >/dev/null 2>&1
             stop_progress "$pid"
             rpm  --quiet -q hhvm
       if [ "$?" = 0 ]
@@ -1216,7 +1210,17 @@ sed -i "s/daemon/server/" /etc/systemd/system/hhvm.service
 sed -i "/.*hhvm.server.port.*/a hhvm.server.ip = 127.0.0.1" /etc/hhvm/server.ini
 sed -i '/.*hhvm.jit_a_size.*/,$d' /etc/hhvm/server.ini
 cat >> /etc/hhvm/server.ini <<END
+
 ## Extra settings
+hhvm.enable_zend_ini_compat = false
+hhvm.php7.all = 1
+hhvm.php7.deprecate_old_style_ctors = 1
+hhvm.php7.engine_exceptions = 1
+hhvm.php7.int_semantics = 1
+hhvm.php7.ltr_assign = 1
+hhvm.php7.no_hex_numerics = 1
+hhvm.php7.scalar_types = 0
+hhvm.php7.uvs = 1
 session.save_handler =  redis
 session.save_path = "tcp://127.0.0.1:6379"
 date.timezone = ${MAGE_TIMEZONE}
