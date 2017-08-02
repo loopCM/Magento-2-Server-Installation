@@ -760,10 +760,12 @@ if [ "${hhvm_install}" == "y" ];then
 echo
             GREENTXT "Installation of HHVM package:"
             echo
+	    cd /usr/local/src/
+	    wget ${HHVM_RPM}
             echo -n "     PROCESSING  "
             start_progress &
             pid="$!"
-            rpm -i ${HHVM_RPM} >/dev/null 2>&1
+            yum -y -q install ${HHVM_RPM##*/} >/dev/null 2>&1
             stop_progress "$pid"
             rpm  --quiet -q hhvm
       if [ "$?" = 0 ]
