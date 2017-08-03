@@ -777,6 +777,7 @@ echo
             cp /usr/lib/systemd/system/hhvm.service /etc/systemd/system/hhvm.service
             sed -i "/^Description=.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/hhvm.service
             sed -i "/\[Install\]/i Restart=on-failure\nRestartSec=10\n" /etc/systemd/system/hhvm.service
+	    sed -i "s,/usr/bin/hhvm,/usr/bin/hhvm --config /etc/hhvm/server.ini," /etc/systemd/system/hhvm.service
             systemctl daemon-reload
             systemctl enable hhvm >/dev/null 2>&1
                else
@@ -1207,7 +1208,7 @@ php_admin_value[memory_limit] = 1024M
 php_admin_value[date.timezone] = ${MAGE_TIMEZONE}
 END
 
-sed -i "s/user hhvm/user ${MAGE_WEB_USER}/" /etc/systemd/system/hhvm.service
+sed -i "s/--user hhvm/--user ${MAGE_WEB_USER}/" /etc/systemd/system/hhvm.service
 sed -i "s/daemon/server/" /etc/systemd/system/hhvm.service
 sed -i '/PrivateTmp/d' /etc/systemd/system/hhvm.service
 
