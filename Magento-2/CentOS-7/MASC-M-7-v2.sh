@@ -761,7 +761,7 @@ echo
             GREENTXT "Installation of HHVM package:"
             echo
 	    cd /usr/local/src/
-	    wget ${HHVM_RPM}
+	    wget -q ${HHVM_RPM} >/dev/null 2>&1
             echo -n "     PROCESSING  "
             start_progress &
             pid="$!"
