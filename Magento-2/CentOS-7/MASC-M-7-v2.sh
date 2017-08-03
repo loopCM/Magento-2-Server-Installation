@@ -1207,14 +1207,12 @@ php_admin_value[memory_limit] = 1024M
 php_admin_value[date.timezone] = ${MAGE_TIMEZONE}
 END
 
-sed -i "s/nginx/${MAGE_WEB_USER}/" /etc/systemd/system/hhvm.service
+sed -i "s/hhvm/${MAGE_WEB_USER}/" /etc/systemd/system/hhvm.service
 sed -i "s/daemon/server/" /etc/systemd/system/hhvm.service
-sed -i "/.*hhvm.server.port.*/a hhvm.server.ip = 127.0.0.1" /etc/hhvm/server.ini
-sed -i '/.*hhvm.jit_a_size.*/,$d' /etc/hhvm/server.ini
-cat >> /etc/hhvm/server.ini <<END
+sed -i '/PrivateTmp/d' /etc/systemd/system/hhvm.service
 
-## Extra settings
-hhvm.enable_zend_ini_compat = false
+cat > /etc/hhvm/server.ini <<END
+;php options
 hhvm.php7.all = 1
 hhvm.php7.deprecate_old_style_ctors = 1
 hhvm.php7.engine_exceptions = 1
@@ -1223,11 +1221,34 @@ hhvm.php7.ltr_assign = 1
 hhvm.php7.no_hex_numerics = 1
 hhvm.php7.scalar_types = 0
 hhvm.php7.uvs = 1
+hhvm.enable_zend_ini_compat = false
+;hhvm specific 
+hhvm.pid_file = "/var/run/hhvm/hhvm.pid"
+hhvm.server.port = 9001
+hhvm.server.ip = 127.0.0.1
+hhvm.server.type = fastcgi
+hhvm.server.default_document = index.php
+hhvm.server.graceful_shutdown_wait = 5
+hhvm.server.enable_keep_alive = true
+hhvm.server.apc.enable_apc = true
+hhvm.server.request_timeout_seconds = 120
+hhvm.server.expose_hphp = false
+hhvm.log.level = Notice
+hhvm.log.always_log_unhandled_exceptions = true
+hhvm.log.runtime_error_reporting_level = 8191
+hhvm.log.use_log_file = true
+hhvm.log.use_syslog = false
+hhvm.log.file = ${MAGE_WEB_ROOT_PATH}/var/log/hhvm_error.log
+hhvm.log.header = true
+hhvm.log.native_stack_trace = true
+hhvm.repo.central.path = /tmp/hhvm.hhbc
+hhvm.jit = true
 session.save_handler =  redis
 session.save_path = "tcp://127.0.0.1:6379"
 date.timezone = ${MAGE_TIMEZONE}
 max_execution_time = 600
 END
+
 systemctl daemon-reload
 systemctl restart hhvm >/dev/null 2>&1
 echo
