@@ -1207,7 +1207,7 @@ php_admin_value[memory_limit] = 1024M
 php_admin_value[date.timezone] = ${MAGE_TIMEZONE}
 END
 
-sed -i "s/hhvm/${MAGE_WEB_USER}/" /etc/systemd/system/hhvm.service
+sed -i "s/user hhvm/user ${MAGE_WEB_USER}/" /etc/systemd/system/hhvm.service
 sed -i "s/daemon/server/" /etc/systemd/system/hhvm.service
 sed -i '/PrivateTmp/d' /etc/systemd/system/hhvm.service
 
