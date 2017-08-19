@@ -23,7 +23,7 @@ REPO_MAGE="composer create-project --repository-url=https://repo.magento.com/ ma
 REPO_MASCM_TMP="https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/tmp/"
 
 # HHVM package
-HHVM_RPM="https://www.dropbox.com/s/cj20m8f1hjqr13r/hhvm-3.20.2-1.x86_64.rpm"
+HHVM_RPM="https://www.dropbox.com/s/xdzl7rglo1ge3im/hhvm-3.21.0-1.x86_64.rpm"
 
 # Webmin Control Panel plugins:
 WEBMIN_NGINX="https://github.com/magenx/webmin-nginx/archive/nginx-0.08.wbm__0.tar.gz"
@@ -1208,6 +1208,7 @@ php_admin_value[memory_limit] = 1024M
 php_admin_value[date.timezone] = ${MAGE_TIMEZONE}
 END
 
+sed -i -e '/User/,+1d' /etc/systemd/system/hhvm.service
 sed -i "s/--user hhvm/--user ${MAGE_WEB_USER}/" /etc/systemd/system/hhvm.service
 sed -i "s/daemon/server/" /etc/systemd/system/hhvm.service
 sed -i '/PrivateTmp/d' /etc/systemd/system/hhvm.service
