@@ -1405,7 +1405,11 @@ sed -i "s/DOMAINNAME/${MAGE_DOMAIN}/" /bin/service-status-mail.sh
 chmod u+x /bin/service-status-mail.sh
 systemctl daemon-reload
 echo
-GREENTXT "REALTIME MALWARE MONITOR WITH E-MAIL ALERTING"
+GREENTXT "MAGENTO MALWARE SCANNER"
+YELLOWTXT "manual scan: mwscan ${MAGE_WEB_ROOT_PATH}"
+pip install --no-cache-dir --upgrade mwscan
+echo
+GREENTXT "MALDET MALWARE MONITOR WITH E-MAIL ALERTING"
 YELLOWTXT "warning: infected files will be moved to quarantine"
 cd /usr/local/src
 git clone https://github.com/rfxn/linux-malware-detect.git
