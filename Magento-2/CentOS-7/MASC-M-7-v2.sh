@@ -1899,7 +1899,7 @@ pause '---> Press [Enter] key to show menu'
 "ossec")
 WHITETXT "============================================================================="
 echo
-GREENTXT "INSTALLATION OF WAZUH 2.0 (OSSEC) + ELK 5.3.0 STACK:"
+GREENTXT "INSTALLATION OF WAZUH 2.1 (OSSEC) + ELK 5 STACK:"
 echo
 GREENTXT "INSTALLATION OF WAZUH MANAGER"
 cat > /etc/yum.repos.d/wazuh.repo <<END
@@ -1939,7 +1939,7 @@ autorefresh=1
 type=rpm-md
 END
 echo
-yum -y -q install elasticsearch-5.3.0 >/dev/null 2>&1
+yum -y -q install elasticsearch >/dev/null 2>&1
 echo
 sed -i "s/.*cluster.name.*/cluster.name: wazuh/" /etc/elasticsearch/elasticsearch.yml
 sed -i "s/.*node.name.*/node.name: wazuh-node1/" /etc/elasticsearch/elasticsearch.yml
@@ -1955,14 +1955,14 @@ echo
 echo
 sleep 15
 GREENTXT "INSTALLATION OF PACKETBEAT:"
-yum -y -q install packetbeat-5.3.0
+yum -y -q install packetbeat
 chkconfig --add packetbeat
 /etc/init.d/packetbeat restart
 /usr/share/packetbeat/scripts/import_dashboards
 echo
 echo
 GREENTXT "INSTALLATION OF LOGSTASH:"
-yum -y -q install logstash-5.3.0
+yum -y -q install logstash
 curl -so /etc/logstash/conf.d/01-wazuh.conf https://raw.githubusercontent.com/wazuh/wazuh/master/extensions/logstash/01-wazuh.conf
 curl -so /etc/logstash/wazuh-elastic5-template.json https://raw.githubusercontent.com/wazuh/wazuh/master/extensions/elasticsearch/wazuh-elastic5-template.json
 usermod -a -G ossec logstash
@@ -1975,15 +1975,14 @@ systemctl start logstash.service
 echo
 echo
 GREENTXT "INSTALLATION OF KIBANA:"
-yum -y -q install kibana-5.3.0
-/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.3.0.zip
+yum -y -q install kibana
+/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp.zip
 echo
 systemctl daemon-reload
 systemctl enable kibana.service
 systemctl restart kibana.service
 echo
 echo
-yum versionlock elasticsearch logstash kibana packetbeat wazuh-manager wazuh-api
 GREETXT "OSSEC WAZUH API SETTINGS"
 sed -i 's/.*config.host.*/config.host = "127.0.0.1";/' /var/ossec/api/configuration/config.js
 echo
