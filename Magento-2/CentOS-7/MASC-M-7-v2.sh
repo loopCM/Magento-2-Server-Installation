@@ -1983,7 +1983,7 @@ systemctl enable kibana.service
 systemctl restart kibana.service
 echo
 echo
-GREETXT "OSSEC WAZUH API SETTINGS"
+GREENTXT "OSSEC WAZUH API SETTINGS"
 sed -i 's/.*config.host.*/config.host = "127.0.0.1";/' /var/ossec/api/configuration/config.js
 echo
 MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/mascm/.mascm_index)
