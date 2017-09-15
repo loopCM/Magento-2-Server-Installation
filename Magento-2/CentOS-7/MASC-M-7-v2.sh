@@ -1695,6 +1695,7 @@ chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH}
 find . -type f -exec chmod 660 {} \;
 find . -type d -exec chmod 2770 {} \;
 chmod u+x wesley.pl mysqltuner.pl cron_check.sh zend_opcache.sh optimages.sh
+cp wesley.pl mysqltuner.pl cron_check.sh zend_opcache.sh optimages.sh ../
 echo
 echo
 echo "===========================  INSTALLATION LOG  ======================================"
