@@ -3,6 +3,8 @@
 ### RELEASE-20.5.7
 
   * magento 1.9.3.6
+  * wazuh(ossec) 2.1
+  * minor code cleanup
 
 ### RELEASE-20.5.6
 
