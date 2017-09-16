@@ -1,5 +1,11 @@
 # Change Log
 
+### RELEASE-20.6.0
+
+  * stronger passwords
+  * varnish repo update
+  * minor code cleanup
+
 ### RELEASE-20.5.7
 
   * magento 1.9.3.6
