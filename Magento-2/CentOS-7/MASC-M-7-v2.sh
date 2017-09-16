@@ -5,7 +5,7 @@
 #        All rights reserved.                                        #
 #====================================================================#
 SELF=$(basename $0)
-MASCM_VER="20.5.7"
+MASCM_VER="20.6.0"
 MASCM_BASE="https://masc.magenx.com"
 
 ### DEFINE LINKS AND PACKAGES STARTS ###
@@ -35,7 +35,7 @@ REPO_REMI="http://rpms.famillecollet.com/enterprise/remi-release-7.rpm"
 REPO_FAN="http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-1-13.rhel7.noarch.rpm"
 
 # WebStack Packages
-EXTRA_PACKAGES="autoconf automake dejavu-fonts-common dejavu-sans-fonts libtidy libpcap gettext-devel cppunit recode boost boost-build boost-jam double-conversion fastlz fribidi gflags glog oniguruma tbb ed lz4 libyaml libdwarf bind-utils e2fsprogs svn screen gcc iptraf inotify-tools smartmontools net-tools mcrypt mlocate unzip vim wget curl sudo bc mailx clamav-filesystem clamav-server clamav-update clamav-milter-systemd clamav-data clamav-server-systemd clamav-scanner-systemd clamav clamav-milter clamav-lib clamav-scanner proftpd logrotate git patch ipset strace rsyslog gifsicle ncurses-devel GeoIP GeoIP-devel GeoIP-update openssl-devel ImageMagick libjpeg-turbo-utils pngcrush lsof net-snmp net-snmp-utils xinetd python-pip python-devel ncftp postfix certbot yum-cron yum-plugin-versionlock sysstat attr iotop expect postgresql-libs unixODBC"
+EXTRA_PACKAGES="autoconf automake dejavu-fonts-common dejavu-sans-fonts libtidy libpcap pygpgme gettext-devel cppunit recode boost boost-build boost-jam double-conversion fastlz fribidi gflags glog oniguruma tbb ed lz4 libyaml libdwarf bind-utils e2fsprogs svn screen gcc iptraf inotify-tools smartmontools net-tools mcrypt mlocate unzip vim wget curl sudo bc mailx clamav-filesystem clamav-server clamav-update clamav-milter-systemd clamav-data clamav-server-systemd clamav-scanner-systemd clamav clamav-milter clamav-lib clamav-scanner proftpd logrotate git patch ipset strace rsyslog gifsicle ncurses-devel GeoIP GeoIP-devel GeoIP-update openssl-devel ImageMagick libjpeg-turbo-utils pngcrush lsof net-snmp net-snmp-utils xinetd python-pip python-devel ncftp postfix certbot yum-cron yum-plugin-versionlock sysstat attr iotop expect postgresql-libs unixODBC"
 PHP_PACKAGES=(cli common fpm opcache gd curl mbstring bcmath soap mcrypt mysqlnd pdo xml xmlrpc intl gmp php-gettext phpseclib recode symfony-class-loader symfony-common tcpdf tcpdf-dejavu-sans-fonts tidy udan11-sql-parser snappy lz4) 
 PHP_PECL_PACKAGES=(pecl-redis pecl-lzf pecl-geoip pecl-zip pecl-memcache pecl-oauth)
 PERCONA_PACKAGES=(client-56 server-56)
@@ -338,14 +338,6 @@ else
 if grep -q "Port 22" /etc/ssh/sshd_config >/dev/null 2>&1 ; then
 REDTXT "DEFAULT SSH PORT :22 DETECTED"
 echo
-echo -n "---> Lets change the default ssh port now? [y/n][n]:"
-read new_ssh_set
-if [ "${new_ssh_set}" == "y" ];then
-   echo
-      cp /etc/ssh/sshd_config /etc/ssh/sshd_config.BACK
-      SSHPORT=$(shuf -i 9537-9554 -n 1)
-      read -e -p "---> Enter a new ssh port : " -i "${SSHPORT}" NEW_SSH_PORT
-      sed -i "s/.*Port 22/Port ${NEW_SSH_PORT}/g" /etc/ssh/sshd_config
       sed -i "s/.*LoginGraceTime.*/LoginGraceTime 30/" /etc/ssh/sshd_config
       sed -i "s/.*MaxAuthTries.*/MaxAuthTries 6/" /etc/ssh/sshd_config
       sed -i "s/.*X11Forwarding.*/X11Forwarding no/" /etc/ssh/sshd_config
@@ -354,6 +346,15 @@ if [ "${new_ssh_set}" == "y" ];then
       sed -i "s/.*ClientAliveInterval.*/ClientAliveInterval 600/" /etc/ssh/sshd_config
       sed -i "s/.*ClientAliveCountMax.*/ClientAliveCountMax 3/" /etc/ssh/sshd_config
       sed -i "s/.*UseDNS.*/UseDNS no/" /etc/ssh/sshd_config
+      
+echo -n "---> Lets change the default ssh port now? [y/n][n]:"
+read new_ssh_set
+if [ "${new_ssh_set}" == "y" ];then
+   echo
+      cp /etc/ssh/sshd_config /etc/ssh/sshd_config.BACK
+      SSHPORT=$(shuf -i 9537-9554 -n 1)
+      read -e -p "---> Enter a new ssh port : " -i "${SSHPORT}" NEW_SSH_PORT
+      sed -i "s/.*Port 22/Port ${NEW_SSH_PORT}/g" /etc/ssh/sshd_config
      echo
         GREENTXT "SSH PORT AND SETTINGS HAS BEEN UPDATED  -  OK"
         systemctl restart sshd.service
@@ -722,13 +723,35 @@ fi
 echo
 WHITETXT "============================================================================="
 echo
-echo -n "---> Start Varnish 4.x installation? [y/n][n]:"
+echo -n "---> Start Varnish 4.1.x installation? [y/n][n]:"
 read varnish_install
 if [ "${varnish_install}" == "y" ];then
           echo
             GREENTXT "Installation of Varnish package:"
             echo
-            rpm --quiet --nosignature -i https://repo.varnish-cache.org/redhat/varnish-4.1.el7.rpm >/dev/null 2>&1
+cat >> /etc/yum.repos.d/varnishcache_varnish41.repo <<END
+[varnishcache_varnish41]
+name=varnishcache_varnish41
+baseurl=https://packagecloud.io/varnishcache/varnish41/el/7/x86_64
+repo_gpgcheck=1
+gpgcheck=0
+enabled=1
+gpgkey=https://packagecloud.io/varnishcache/varnish41/gpgkey
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+
+[varnishcache_varnish41-source]
+name=varnishcache_varnish41-source
+baseurl=https://packagecloud.io/varnishcache/varnish41/el/7/SRPMS
+repo_gpgcheck=1
+gpgcheck=0
+enabled=1
+gpgkey=https://packagecloud.io/varnishcache/varnish41/gpgkey
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+END
             echo -n "     PROCESSING  "
             start_progress &
             pid="$!"
@@ -929,7 +952,7 @@ echo
      echo
         mkdir -p ${MAGE_WEB_ROOT_PATH} && cd $_
         useradd -d ${MAGE_WEB_ROOT_PATH%/*} -s /sbin/nologin ${MAGE_WEB_USER}  >/dev/null 2>&1
-        MAGE_WEB_USER_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1)
+        MAGE_WEB_USER_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
         echo "${MAGE_WEB_USER}:${MAGE_WEB_USER_PASS}"  | chpasswd  >/dev/null 2>&1
         chmod 711 /home/${MAGE_WEB_USER}
         chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH%/*}
@@ -971,8 +994,8 @@ GREENTXT "MAGENTO DATABASE AND DATABASE USER"
 echo
 systemctl start mysql.service
 MAGE_SEL_VER=$(awk '/webshop/ { print $6 }' /root/mascm/.mascm_index)
-MYSQL_ROOT_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1)
-MAGE_DB_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1)
+MYSQL_ROOT_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
+MAGE_DB_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
 
 MYSQL_SECURE_INSTALLATION=$(expect -c "
 set timeout 5
@@ -1068,7 +1091,7 @@ read -e -p "---> Enter your First Name: " -i "Name"  MAGE_ADMIN_FNAME
 read -e -p "---> Enter your Last Name: " -i "Lastname"  MAGE_ADMIN_LNAME
 read -e -p "---> Enter your email: " -i "admin@${MAGE_DOMAIN}"  MAGE_ADMIN_EMAIL
 read -e -p "---> Enter your admins login name: " -i "admin"  MAGE_ADMIN_LOGIN
-MAGE_ADMIN_PASSGEN=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
+MAGE_ADMIN_PASSGEN=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 10 | head -n 1)
 read -e -p "---> Use generated admin password: " -i "${MAGE_ADMIN_PASSGEN}${RANDOM}"  MAGE_ADMIN_PASS
 read -e -p "---> Enter your shop url: " -i "http://${MAGE_DOMAIN}/"  MAGE_SITE_URL
 echo
@@ -1090,7 +1113,7 @@ su ${MAGE_WEB_USER} -s /bin/bash -c "php -f install.php -- \
 --db_host "${MAGE_DB_HOST}" \
 --db_name "${MAGE_DB_NAME}" \
 --db_user "${MAGE_DB_USER_NAME}" \
---db_pass "${MAGE_DB_PASS}" \
+--db_pass '${MAGE_DB_PASS}' \
 --url "${MAGE_SITE_URL}" \
 --use_rewrites "yes" \
 --use_secure "no" \
@@ -1102,7 +1125,7 @@ su ${MAGE_WEB_USER} -s /bin/bash -c "php -f install.php -- \
 --admin_lastname "${MAGE_ADMIN_LNAME}" \
 --admin_email "${MAGE_ADMIN_EMAIL}" \
 --admin_username "${MAGE_ADMIN_LOGIN}" \
---admin_password "${MAGE_ADMIN_PASS}""
+--admin_password '${MAGE_ADMIN_PASS}'"
     echo
     WHITETXT "============================================================================="
     echo
@@ -1133,12 +1156,12 @@ su ${MAGE_WEB_USER} -s /bin/bash -c "bin/magento setup:install --base-url=${MAGE
 --db-host=${MAGE_DB_HOST} \
 --db-name=${MAGE_DB_NAME} \
 --db-user=${MAGE_DB_USER_NAME} \
---db-password=${MAGE_DB_PASS} \
+--db-password='${MAGE_DB_PASS}' \
 --admin-firstname=${MAGE_ADMIN_FNAME} \
 --admin-lastname=${MAGE_ADMIN_LNAME} \
 --admin-email=${MAGE_ADMIN_EMAIL} \
 --admin-user=${MAGE_ADMIN_LOGIN} \
---admin-password=${MAGE_ADMIN_PASS} \
+--admin-password='${MAGE_ADMIN_PASS}' \
 --language=${MAGE_LOCALE} \
 --currency=${MAGE_CURRENCY} \
 --timezone=${MAGE_TIMEZONE} \
@@ -1283,8 +1306,8 @@ sed -i "s,/var/www/html,${MAGE_WEB_ROOT_PATH},g" /etc/nginx/sites-available/mage
 echo
 GREENTXT "PHPMYADMIN INSTALLATION AND CONFIGURATION"
      PMA_FOLDER=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
-     PMA_PASSWD=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
-     BLOWFISHCODE=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
+     PMA_PASSWD=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 6 | head -n 1)
+     BLOWFISHCODE=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9=+_[]{}()<>-' | fold -w 64 | head -n 1)
      yum -y -q --enablerepo=remi,remi-test,remi-php70 install phpMyAdmin
      USER_IP=${SSH_CLIENT%% *} 
      sed -i "s/.*blowfish_secret.*/\$cfg['blowfish_secret'] = '${BLOWFISHCODE}';/" /etc/phpMyAdmin/config.inc.php
@@ -1407,14 +1430,14 @@ systemctl daemon-reload
 echo
 GREENTXT "MAGENTO MALWARE SCANNER"
 YELLOWTXT "manual scan: mwscan ${MAGE_WEB_ROOT_PATH}"
-pip install --no-cache-dir --upgrade mwscan
+pip -q install --no-cache-dir --upgrade mwscan
 echo
 GREENTXT "MALDET MALWARE MONITOR WITH E-MAIL ALERTING"
 YELLOWTXT "warning: infected files will be moved to quarantine"
 cd /usr/local/src
 git clone https://github.com/rfxn/linux-malware-detect.git
 cd linux-malware-detect
-./install.sh >/dev/null 2>&1
+./install.sh > maldet-make-log-file 2>&1
 
 sed -i 's/email_alert="0"/email_alert="1"/' /usr/local/maldetect/conf.maldet
 sed -i "s/you@domain.com/${MAGE_ADMIN_EMAIL}/" /usr/local/maldetect/conf.maldet
@@ -1441,8 +1464,8 @@ git clone https://github.com/allinurl/goaccess.git
 cd goaccess
 autoreconf -fi
 ./configure --enable-utf8 --enable-geoip=legacy --with-openssl  >/dev/null 2>&1
-make  >/dev/null 2>&1
-make install  >/dev/null 2>&1
+make > goaccess-make-log-file 2>&1
+make install > goaccess-make-log-file 2>&1
 echo
 GREENTXT "MAGENTO CRONJOBS"
 if [ "${MAGE_SEL_VER}" = "1" ]; then
@@ -1614,13 +1637,16 @@ systemctl restart redis-6379.service
 systemctl restart redis-6380.service
 
 cd ${MAGE_WEB_ROOT_PATH}
+mkdir -p ../saved_scripts
 chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH%/*}
 GREENTXT "OPCACHE INVALIDATION MONITOR"
 OPCACHE_FILE=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z' | fold -w 12 | head -n 1)
 if [ "${MAGE_SEL_VER}" = "1" ]; then
 wget -qO ${MAGE_WEB_ROOT_PATH}/${OPCACHE_FILE}_opcache_gui.php https://raw.githubusercontent.com/magenx/opcache-gui/master/index.php
+cp ${OPCACHE_FILE}_opcache_gui.php ../saved_scripts/
 else
 wget -qO ${MAGE_WEB_ROOT_PATH}/pub/${OPCACHE_FILE}_opcache_gui.php https://raw.githubusercontent.com/magenx/opcache-gui/master/index.php
+cp pub/${OPCACHE_FILE}_opcache_gui.php ../saved_scripts/
 fi
 cat > ${MAGE_WEB_ROOT_PATH}/zend_opcache.sh <<END
 #!/bin/bash
@@ -1661,8 +1687,8 @@ echo
 curl -s -o n98-magerun2.phar https://files.magerun.net/n98-magerun2.phar
 chmod u+x bin/magento
 GREENTXT "SAVING COMPOSER JSON AND LOCK"
-cp composer.json ../composer.json.saved
-cp composer.lock ../composer.lock.saved
+cp composer.json ../saved_scripts/composer.json.saved
+cp composer.lock ../saved_scripts/composer.lock.saved
 fi
 echo
 GREENTXT "IMAGES OPTIMIZATION SCRIPT"
@@ -1695,7 +1721,7 @@ chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH}
 find . -type f -exec chmod 660 {} \;
 find . -type d -exec chmod 2770 {} \;
 chmod u+x wesley.pl mysqltuner.pl cron_check.sh zend_opcache.sh optimages.sh
-cp wesley.pl mysqltuner.pl cron_check.sh zend_opcache.sh optimages.sh ../
+cp wesley.pl mysqltuner.pl cron_check.sh zend_opcache.sh optimages.sh ../saved_scripts/
 echo
 echo
 echo "===========================  INSTALLATION LOG  ======================================"
@@ -1710,6 +1736,7 @@ echo
 WHITETXT "[phpmyadmin url]: ${MAGE_DOMAIN}/mysql_${PMA_FOLDER}"
 WHITETXT "[phpmyadmin http auth name]: mysql"
 WHITETXT "[phpmyadmin http auth pass]: ${PMA_PASSWD}"
+WHITETXT "[phpmyadmin allowed ip]: ${USER_IP}"
 echo
 WHITETXT "[mysql host]: ${MAGE_DB_HOST}"
 WHITETXT "[mysql user]: ${MAGE_DB_USER_NAME}"
@@ -1720,8 +1747,8 @@ echo
 WHITETXT "[ftp port]: ${FTP_PORT}"
 WHITETXT "[ftp user]: ${MAGE_WEB_USER}"
 WHITETXT "[ftp password]: ${MAGE_WEB_USER_PASS}"
-WHITETXT "[ftp geoip]: ${USER_GEOIP}"
-WHITETXT "[ftp ip login]: ${USER_IP}"
+WHITETXT "[ftp allowed geoip]: ${USER_GEOIP}"
+WHITETXT "[ftp allowed ip]: ${USER_IP}"
 echo
 WHITETXT "[opcache gui]: ${OPCACHE_FILE}_opcache_gui.php"
 echo
@@ -1875,8 +1902,8 @@ rpm --import http://www.webmin.com/jcameron-key.asc
             fi
             sed -i 's/root/webadmin/' /etc/webmin/miniserv.users
             sed -i 's/root:/webadmin:/' /etc/webmin/webmin.acl
-            WEBADMIN_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1)
-            /usr/libexec/webmin/changepass.pl /etc/webmin/ webadmin ${WEBADMIN_PASS} >/dev/null 2>&1
+            WEBADMIN_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
+            /usr/libexec/webmin/changepass.pl /etc/webmin/ webadmin "${WEBADMIN_PASS}" >/dev/null 2>&1
             chkconfig webmin on >/dev/null 2>&1
             service webmin restart  >/dev/null 2>&1
             YELLOWTXT "Access Webmin on port: ${WEBMIN_PORT}"
@@ -1990,11 +2017,11 @@ echo
 MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/mascm/.mascm_index)
 KIBANA_PORT=$(shuf -i 10322-10539 -n 1)
 USER_IP=${SSH_CLIENT%% *}
-KIBANA_PASSWD=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
-WAZUH_API_PASSWD=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
-htpasswd -b -c /etc/nginx/.wazuh wazuh-web ${KIBANA_PASSWD}  >/dev/null 2>&1
+KIBANA_PASSWD=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 6 | head -n 1)
+WAZUH_API_PASSWD=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 6 | head -n 1)
+htpasswd -b -c /etc/nginx/.wazuh wazuh-web "${KIBANA_PASSWD}"  >/dev/null 2>&1
 cd /var/ossec/api/configuration/auth
-htpasswd -b -c user wazuh-api ${WAZUH_API_PASSWD}  >/dev/null 2>&1
+htpasswd -b -c user wazuh-api "${WAZUH_API_PASSWD}"  >/dev/null 2>&1
 systemctl restart wazuh-api
 cat > /etc/nginx/sites-available/kibana.conf <<END
 server {
