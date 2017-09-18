@@ -996,32 +996,16 @@ systemctl start mysql.service
 MAGE_SEL_VER=$(awk '/webshop/ { print $6 }' /root/mascm/.mascm_index)
 MYSQL_ROOT_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
 MAGE_DB_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
-
-MYSQL_SECURE_INSTALLATION=$(expect -c "
-set timeout 5
-log_user 0
-spawn mysql_secure_installation
-expect \"Enter current password for root (enter for none):\"
-send \"\r\"
-expect \"Set root password?\"
-send \"y\r\"
-expect \"New password:\"
-send \"${MYSQL_ROOT_PASS}\r\"
-expect \"Re-enter new password:\"
-send \"${MYSQL_ROOT_PASS}\r\"
-expect \"Remove anonymous users?\"
-send \"y\r\"
-expect \"Disallow root login remotely?\"
-send \"y\r\"
-expect \"Remove test database and access to it?\"
-send \"y\r\"
-expect \"Reload privilege tables now?\"
-send \"y\r\"
-expect eof
-")
-
-echo "${MYSQL_SECURE_INSTALLATION}"
 echo
+mysql -u root <<EOMYSQL
+UPDATE mysql.user SET Password=PASSWORD("${MYSQL_ROOT_PASS}") WHERE User='root';
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+FLUSH PRIVILEGES;
+exit
+EOMYSQL
 echo
 read -e -p "---> Enter Magento database host : " -i "localhost" MAGE_DB_HOST
 read -e -p "---> Enter Magento database name : " -i "m${MAGE_SEL_VER}d_$(openssl rand 2 -hex)_$(date +%y%m%d)" MAGE_DB_NAME
