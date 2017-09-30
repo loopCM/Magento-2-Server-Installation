@@ -4,7 +4,7 @@ MASC-M<sup>™</sup>
 ======
 
 ---->> Magento **1.9.3.x**<br/>
----->> Magento **2.1.x**
+---->> Magento **2.2.x**
 
 *** during installation select your Magento version: 1 or 2
 
@@ -17,6 +17,7 @@ Magento installation including: <br/>
 - HHVM
 - VARNISH
 - NGINX
+- [PAGESPEED](https://github.com/pagespeed/ngx_pagespeed)
 - PHP 7
 - REDIS (2 instances 6379|6380)
 - MEMCACHED
