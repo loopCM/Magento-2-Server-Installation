@@ -1443,6 +1443,7 @@ maldet --monitor /usr/local/maldetect/monitor_paths >/dev/null 2>&1
 chmod u+x /etc/rc.local
 echo
 GREENTXT "GOACCESS REALTIME ACCESS LOG DASHBOARD"
+YELLOWTXT "goaccess access.log -o ${MAGE_WEB_ROOT_PATH}/access_report_${RANDOM}.html --real-time-html"
 cd /usr/local/src
 git clone https://github.com/allinurl/goaccess.git
 cd goaccess
@@ -1455,17 +1456,18 @@ GREENTXT "MAGENTO CRONJOBS"
 if [ "${MAGE_SEL_VER}" = "1" ]; then
         echo "MAILTO=${MAGE_ADMIN_EMAIL}" >> magecron
         echo "* * * * * ! test -e ${MAGE_WEB_ROOT_PATH}/maintenance.flag && /bin/bash ${MAGE_WEB_ROOT_PATH}/cron.sh  > /dev/null" >> magecron
-        echo "*/5 * * * * /bin/bash ${MAGE_WEB_ROOT_PATH}/cron_check.sh" >> magecron
-        echo "5 8 * * 7 perl ${MAGE_WEB_ROOT_PATH}/mysqltuner.pl --nocolor 2>&1 | mailx -E -s \"MYSQLTUNER WEEKLY REPORT at ${HOSTNAME}\" ${MAGE_ADMIN_EMAIL}" >> magecron
-	else
-		echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento cron:run" >> magecron
-		echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/update/cron.php" >> magecron
-		echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento setup:cron:run" >> magecron
-		echo "*/5 * * * * /bin/bash ${MAGE_WEB_ROOT_PATH}/cron_check.sh" >> magecron
-                echo "5 8 * * 7 perl ${MAGE_WEB_ROOT_PATH}/mysqltuner.pl --nocolor 2>&1 | mailx -E -s \"MYSQLTUNER WEEKLY REPORT at ${HOSTNAME}\" ${MAGE_ADMIN_EMAIL}" >> magecron     
+    else
+	echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento cron:run" >> magecron
+	echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/update/cron.php" >> magecron
+	echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento setup:cron:run" >> magecron		
 fi
+echo "*/5 * * * * /bin/bash ${MAGE_WEB_ROOT_PATH}/cron_check.sh" >> magecron
 crontab -u ${MAGE_WEB_USER} magecron
+echo "5 8 * * 7 perl ${MAGE_WEB_ROOT_PATH}/mysqltuner.pl --nocolor 2>&1 | mailx -E -s \"MYSQLTUNER WEEKLY REPORT at ${HOSTNAME}\" ${MAGE_ADMIN_EMAIL}" >> rootcron
+echo "30 23 * * * cd /var/log/nginx/; goaccess access.log -a -o access_log_report.html 2>&1 && echo | mailx -s \"Daily access log report at ${HOSTNAME}\" -a access_log_report.html ${MAGE_ADMIN_EMAIL}" >> rootcron
+crontab rootcron
 rm magecron
+rm rootcron
 echo
 GREENTXT "REDIS CACHE AND SESSION STORAGE"
 if [ "${MAGE_SEL_VER}" = "1" ]; then
