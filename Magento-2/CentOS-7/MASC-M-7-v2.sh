@@ -1413,7 +1413,7 @@ chmod u+x /bin/service-status-mail.sh
 systemctl daemon-reload
 echo
 GREENTXT "MAGENTO MALWARE SCANNER"
-YELLOWTXT "manual scan: mwscan ${MAGE_WEB_ROOT_PATH}"
+YELLOWTXT "mwscan ${MAGE_WEB_ROOT_PATH}"
 pip -q install --no-cache-dir --upgrade mwscan
 echo
 GREENTXT "MALDET MALWARE MONITOR WITH E-MAIL ALERTING"
@@ -1451,6 +1451,9 @@ autoreconf -fi
 ./configure --enable-utf8 --enable-geoip=legacy --with-openssl  >/dev/null 2>&1
 make > goaccess-make-log-file 2>&1
 make install > goaccess-make-log-file 2>&1
+sed -i '13s/#//' /etc/goaccess.conf
+sed -i '36s/#//' /etc/goaccess.conf
+sed -i '70s/#//' /etc/goaccess.conf
 echo
 GREENTXT "MAGENTO CRONJOBS"
 if [ "${MAGE_SEL_VER}" = "1" ]; then
