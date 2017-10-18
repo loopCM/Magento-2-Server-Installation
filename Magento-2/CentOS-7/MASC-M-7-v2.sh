@@ -43,6 +43,7 @@ PERL_MODULES=(libwww-perl CPAN Template-Toolkit Time-HiRes ExtUtils-CBuilder Ext
 SPHINX="http://sphinxsearch.com/files/sphinx-2.2.11-1.rhel7.x86_64.rpm"
 
 # Nginx extra configuration
+NGINX_VERSION=$(curl -s http://nginx.org/en/download.html | grep -oP '(?<=gz">).*?(?=</a>)' | head -1)
 NGINX_BASE="https://raw.githubusercontent.com/magenx/Magento-nginx-config/master/"
 NGINX_EXTRA_CONF="assets.conf error_page.conf extra_protect.conf export.conf status.conf setup.conf php_backend.conf maps.conf phpmyadmin.conf maintenance.conf"
 
@@ -555,16 +556,13 @@ fi
 echo
 WHITETXT "============================================================================="
 echo
-echo -n "---> Start Nginx (mainline) Repository installation? [y/n][n]:"
+echo -n "---> Start ${NGINX_VERSION} installation? [y/n][n]:"
 read repo_nginx_install
 if [ "${repo_nginx_install}" == "y" ];then
           echo
-            GREENTXT "Installation of Nginx (mainline) repository:"
-            echo
             WHITETXT "Downloading Nginx GPG key"
             wget -qO /etc/pki/rpm-gpg/nginx_signing.key  http://nginx.org/packages/keys/nginx_signing.key
             echo
-            WHITETXT "Nginx (mainline) repository file"
             echo
 cat >> /etc/yum.repos.d/nginx.repo <<END
 [nginx]
@@ -605,7 +603,7 @@ END
       fi
         else
           echo
-            YELLOWTXT "Nginx (mainline) repository installation was skipped by the user. Next step"
+            YELLOWTXT "Nginx repository installation was skipped by the user. Next step"
 fi
 echo
 WHITETXT "============================================================================="
