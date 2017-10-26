@@ -564,7 +564,7 @@ if [ "${repo_nginx_install}" == "y" ];then
             wget -qO /etc/pki/rpm-gpg/nginx_signing.key  http://nginx.org/packages/keys/nginx_signing.key
             echo
             echo
-cat >> /etc/yum.repos.d/nginx.repo <<END
+cat > /etc/yum.repos.d/nginx.repo <<END
 [nginx]
 name=nginx repo
 baseurl=http://nginx.org/packages/mainline/centos/7/x86_64/
