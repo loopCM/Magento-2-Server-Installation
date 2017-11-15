@@ -1,5 +1,10 @@
 # Change Log
 
+### RELEASE-20.7.0
+
+  * install Percona 56 or 57
+  * minor code cleanup
+  
 ### RELEASE-20.6.0
 
   * stronger passwords
