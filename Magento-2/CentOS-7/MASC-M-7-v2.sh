@@ -5,7 +5,7 @@
 #        All rights reserved.                                        #
 #====================================================================#
 SELF=$(basename $0)
-MASCM_VER="20.6.0"
+MASCM_VER="20.7.0"
 MASCM_BASE="https://masc.magenx.com"
 
 ### DEFINE LINKS AND PACKAGES STARTS ###
@@ -38,7 +38,6 @@ REPO_FAN="http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-1-13
 EXTRA_PACKAGES="autoconf automake dejavu-fonts-common dejavu-sans-fonts libtidy libpcap pygpgme gettext-devel cppunit recode boost boost-build boost-jam double-conversion fastlz fribidi gflags glog oniguruma tbb ed lz4 libyaml libdwarf bind-utils e2fsprogs svn screen gcc iptraf inotify-tools smartmontools net-tools mcrypt mlocate unzip vim wget curl sudo bc mailx clamav-filesystem clamav-server clamav-update clamav-milter-systemd clamav-data clamav-server-systemd clamav-scanner-systemd clamav clamav-milter clamav-lib clamav-scanner proftpd logrotate git patch ipset strace rsyslog gifsicle ncurses-devel GeoIP GeoIP-devel GeoIP-update openssl-devel ImageMagick libjpeg-turbo-utils pngcrush lsof net-snmp net-snmp-utils xinetd python-pip python-devel ncftp postfix certbot yum-cron yum-plugin-versionlock sysstat attr iotop expect postgresql-libs unixODBC yum install gcc-c++"
 PHP_PACKAGES=(cli common fpm opcache gd curl mbstring bcmath soap mcrypt mysqlnd pdo xml xmlrpc intl gmp php-gettext phpseclib recode symfony-class-loader symfony-common tcpdf tcpdf-dejavu-sans-fonts tidy udan11-sql-parser snappy lz4) 
 PHP_PECL_PACKAGES=(pecl-redis pecl-lzf pecl-geoip pecl-zip pecl-memcache pecl-oauth)
-PERCONA_PACKAGES=(client-56 server-56)
 PERL_MODULES=(libwww-perl CPAN Template-Toolkit Time-HiRes ExtUtils-CBuilder ExtUtils-Embed ExtUtils-MakeMaker TermReadKey DBI DBD-MySQL Digest-HMAC Digest-SHA1 Test-Simple Moose Net-SSLeay devel)
 SPHINX="http://sphinxsearch.com/files/sphinx-2.2.11-1.rhel7.x86_64.rpm"
 
@@ -475,7 +474,7 @@ echo -n "---> Start Percona repository and Percona database installation? [y/n][
 read repo_percona_install
 if [ "${repo_percona_install}" == "y" ];then
           echo
-            GREENTXT "Installation of Percona repository:"
+            read -e -p "---> Select Percona database version to install 56 or 57: " -i "56"  PERCONA_VER
             echo
             echo -n "     PROCESSING  "
             quick_progress &
@@ -489,14 +488,14 @@ if [ "${repo_percona_install}" == "y" ];then
             GREENTXT "REPOSITORY HAS BEEN INSTALLED  -  OK"
               echo
               echo
-              GREENTXT "Installation of Percona 5.6 database:"
+              GREENTXT "Installation of Percona ${PERCONA_VER} database:"
               echo
               echo -n "     PROCESSING  "
               long_progress &
               pid="$!"
-              yum -y -q install ${PERCONA_PACKAGES[@]/#/Percona-Server-}  >/dev/null 2>&1
+              yum -y -q install Percona-Server-server-${PERCONA_VER} Percona-Server-client-${PERCONA_VER} >/dev/null 2>&1
               stop_progress "$pid"
-              rpm  --quiet -q ${PERCONA_PACKAGES[@]/#/Percona-Server-}
+              rpm  --quiet -q Percona-Server-server-${PERCONA_VER} Percona-Server-client-${PERCONA_VER}
         if [ "$?" = 0 ] # if package installed then configure
           then
             echo
@@ -539,6 +538,7 @@ if [ "${repo_percona_install}" == "y" ];then
               WHITETXT "mytop"
               WHITETXT "perl mysqltuner.pl"
               echo
+	      echo ${PERCONA_VER} > /root/mascm/.percona
               else
               echo
               REDTXT "DATABASE INSTALLATION ERROR"
@@ -991,10 +991,26 @@ WHITETXT "======================================================================
 GREENTXT "MAGENTO DATABASE AND DATABASE USER"
 echo
 systemctl start mysql.service
+PERCONA_VER=$(cat /root/mascm/.percona)
 MAGE_SEL_VER=$(awk '/webshop/ { print $6 }' /root/mascm/.mascm_index)
-MYSQL_ROOT_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
-MAGE_DB_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
+MYSQL_ROOT_PASS_GEN=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
+MYSQL_ROOT_PASS="${MYSQL_ROOT_PASS_GEN}${RANDOM}#"
+MAGE_DB_PASS_GEN=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_{}()<>-' | fold -w 15 | head -n 1)
+MAGE_DB_PASS="${MAGE_DB_PASS_GEN}${RANDOM}#"
+MYSQL_ROOT_TMP_PASS=$(grep 'temporary password is generated for' /var/log/mysqld.log | awk '{print $NF}')
 echo
+## this will be fixed in future
+if [ "${PERCONA_VER}" = "57" ]; then
+mysql --connect-expired-password -u root -p${MYSQL_ROOT_TMP_PASS}  <<EOMYSQL
+ALTER USER 'root'@'localhost' IDENTIFIED BY "${MYSQL_ROOT_PASS}";
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+FLUSH PRIVILEGES;
+exit
+EOMYSQL
+else
 mysql -u root <<EOMYSQL
 UPDATE mysql.user SET Password=PASSWORD("${MYSQL_ROOT_PASS}") WHERE User='root';
 DELETE FROM mysql.user WHERE User='';
@@ -1004,6 +1020,7 @@ DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 FLUSH PRIVILEGES;
 exit
 EOMYSQL
+fi
 echo
 read -e -p "---> Enter Magento database host : " -i "localhost" MAGE_DB_HOST
 read -e -p "---> Enter Magento database name : " -i "m${MAGE_SEL_VER}d_$(openssl rand 2 -hex)_$(date +%y%m%d)" MAGE_DB_NAME
@@ -1026,7 +1043,7 @@ END
 cat > /root/.my.cnf <<END
 [client]
 user=root
-password=${MYSQL_ROOT_PASS}
+password="${MYSQL_ROOT_PASS}"
 END
 echo
 mkdir -p /root/mascm/
@@ -1449,9 +1466,9 @@ autoreconf -fi
 ./configure --enable-utf8 --enable-geoip=legacy --with-openssl  >/dev/null 2>&1
 make > goaccess-make-log-file 2>&1
 make install > goaccess-make-log-file 2>&1
-sed -i '13s/#//' /etc/goaccess.conf
-sed -i '36s/#//' /etc/goaccess.conf
-sed -i '70s/#//' /etc/goaccess.conf
+sed -i '13s/#//' /etc/goaccess.conf >/dev/null 2>&1
+sed -i '36s/#//' /etc/goaccess.conf >/dev/null 2>&1
+sed -i '70s/#//' /etc/goaccess.conf >/dev/null 2>&1
 echo
 GREENTXT "MAGENTO CRONJOBS"
 if [ "${MAGE_SEL_VER}" = "1" ]; then
