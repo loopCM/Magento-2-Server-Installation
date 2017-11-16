@@ -42,7 +42,7 @@ PERL_MODULES=(libwww-perl CPAN Template-Toolkit Time-HiRes ExtUtils-CBuilder Ext
 SPHINX="http://sphinxsearch.com/files/sphinx-2.2.11-1.rhel7.x86_64.rpm"
 
 # Nginx extra configuration
-NGINX_VERSION=$(curl -s http://nginx.org/en/download.html | grep -oP '(?<=gz">).*?(?=</a>)' | head -1)
+NGINX_VERSION=$(curl -s http://nginx.org/en/download.html | grep -oP '(?<=gz">nginx-).*?(?=</a>)' | head -1)
 NGINX_BASE="https://raw.githubusercontent.com/magenx/Magento-nginx-config/master/"
 NGINX_EXTRA_CONF="assets.conf error_page.conf extra_protect.conf export.conf status.conf setup.conf php_backend.conf maps.conf phpmyadmin.conf maintenance.conf"
 
@@ -556,7 +556,7 @@ fi
 echo
 WHITETXT "============================================================================="
 echo
-echo -n "---> Start ${NGINX_VERSION} installation? [y/n][n]:"
+echo -n "---> Start nginx ${NGINX_VERSION} installation? [y/n][n]:"
 read repo_nginx_install
 if [ "${repo_nginx_install}" == "y" ];then
           echo
@@ -575,7 +575,7 @@ END
             echo
             GREENTXT "REPOSITORY HAS BEEN INSTALLED  -  OK"
             echo
-            GREENTXT "Installation of NGINX package:"
+            GREENTXT "Installation of nginx package:"
             echo
             echo -n "     PROCESSING  "
             start_progress &
