@@ -1428,8 +1428,16 @@ chmod u+x /bin/service-status-mail.sh
 systemctl daemon-reload
 echo
 GREENTXT "MAGENTO MALWARE SCANNER"
-YELLOWTXT "mwscan ${MAGE_WEB_ROOT_PATH}"
+YELLOWTXT "Hourly cronjob created"
 pip -q install --no-cache-dir --upgrade mwscan
+cat > /etc/cron.hourly/mwscan <<END
+## MAGENTO MALWARE SCANNER
+MAILTO="${MAGE_ADMIN_EMAIL}"
+RULESURL="https://raw.githubusercontent.com/gwillem/magento-malware-scanner/master/build/all-confirmed.yar"
+RULEFILE="/tmp/rules.yar"
+
+/usr/bin/curl -s ${RULESURL} -o ${RULEFILE} && /usr/bin/mwscan --quiet --newonly --rules ${RULEFILE} ${MAGE_WEB_ROOT_PATH}
+END
 echo
 GREENTXT "MALDET MALWARE MONITOR WITH E-MAIL ALERTING"
 YELLOWTXT "warning: infected files will be moved to quarantine"
@@ -1466,9 +1474,9 @@ autoreconf -fi
 ./configure --enable-utf8 --enable-geoip=legacy --with-openssl  >/dev/null 2>&1
 make > goaccess-make-log-file 2>&1
 make install > goaccess-make-log-file 2>&1
-sed -i '13s/#//' /etc/goaccess.conf >/dev/null 2>&1
-sed -i '36s/#//' /etc/goaccess.conf >/dev/null 2>&1
-sed -i '70s/#//' /etc/goaccess.conf >/dev/null 2>&1
+sed -i '13s/#//' /usr/local/etc/goaccess.conf >/dev/null 2>&1
+sed -i '36s/#//' /usr/local/etc/goaccess.conf >/dev/null 2>&1
+sed -i '70s/#//' /usr/local/etc/goaccess.conf >/dev/null 2>&1
 echo
 GREENTXT "MAGENTO CRONJOBS"
 if [ "${MAGE_SEL_VER}" = "1" ]; then
