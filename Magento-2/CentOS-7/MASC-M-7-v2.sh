@@ -1661,7 +1661,7 @@ cat > ${MAGE_WEB_ROOT_PATH}/zend_opcache.sh <<END
 ## monitor magento folder and invalidate opcache
 /usr/bin/inotifywait -e modify,move \\
     -mrq --timefmt %a-%b-%d-%T --format '%w%f %T' \\
-    --excludei '/(cache|log|session|report|locks|media|skin|tmp)/|\.(xml|html?|css|js|gif|jpe?g|png|ico|te?mp|txt|csv|swp|sql|t?gz|zip|svn?g|git|log|ini|sh|pl)~?' \\
+    --excludei '/(var|media|static|skin|tmp)/|\.(xml|html?|css|js|gif|jpe?g|png|ico|te?mp|txt|csv|swp|sql|t?gz|zip|svn?g|git|log|ini|sh|pl)~?' \\
     ${MAGE_WEB_ROOT_PATH}/ | while read line; do
     echo "\$line " >> /var/log/zend_opcache_monitor.log
     FILE=\$(echo \${line} | cut -d' ' -f1 | sed -e 's/\/\./\//g' | cut -f1-2 -d'.')
