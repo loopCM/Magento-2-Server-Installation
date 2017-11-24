@@ -1449,7 +1449,6 @@ cd linux-malware-detect
 sed -i 's/email_alert="0"/email_alert="1"/' /usr/local/maldetect/conf.maldet
 sed -i "s/you@domain.com/${MAGE_ADMIN_EMAIL}/" /usr/local/maldetect/conf.maldet
 sed -i 's/quarantine_hits="0"/quarantine_hits="1"/' /usr/local/maldetect/conf.maldet
-sed -i 's,# default_monitor_mode="/usr/local/maldetect/monitor_paths",default_monitor_mode="/usr/local/maldetect/monitor_paths",' /usr/local/maldetect/conf.maldet
 sed -i 's/inotify_base_watches="16384"/inotify_base_watches="85384"/' /usr/local/maldetect/conf.maldet
 echo -e "${MAGE_WEB_ROOT_PATH%/*}\n\n/var/tmp/\n\n/tmp/" > /usr/local/maldetect/monitor_paths
 
@@ -1461,9 +1460,6 @@ systemctl daemon-reload
 sed -i "/^Example/d" /etc/clamd.d/scan.conf
 sed -i "/^Example/d" /etc/freshclam.conf
 sed -i "/^FRESHCLAM_DELAY/d" /etc/sysconfig/freshclam
-echo "maldet --monitor /usr/local/maldetect/monitor_paths" >> /etc/rc.local
-maldet --monitor /usr/local/maldetect/monitor_paths >/dev/null 2>&1
-chmod u+x /etc/rc.local
 echo
 GREENTXT "GOACCESS REALTIME ACCESS LOG DASHBOARD"
 YELLOWTXT "goaccess access.log -o ${MAGE_WEB_ROOT_PATH}/access_report_${RANDOM}.html --real-time-html"
