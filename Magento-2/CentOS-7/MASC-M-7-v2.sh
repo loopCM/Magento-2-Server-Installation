@@ -5,7 +5,7 @@
 #        All rights reserved.                                        #
 #====================================================================#
 SELF=$(basename $0)
-MASCM_VER="20.7.0"
+MASCM_VER="20.7.9"
 MASCM_BASE="https://masc.magenx.com"
 
 ### DEFINE LINKS AND PACKAGES STARTS ###
@@ -532,11 +532,6 @@ if [ "${repo_percona_install}" == "y" ];then
               perl Makefile.PL && make && make install  >/dev/null 2>&1
               yum -y -q install percona-toolkit >/dev/null 2>&1
               echo
-              WHITETXT "Please use these tools to check and finetune your database:"
-              echo
-              WHITETXT "Percona Toolkit with pt- commands"
-              WHITETXT "mytop"
-              WHITETXT "perl mysqltuner.pl"
               echo
 	      echo ${PERCONA_VER} > /root/mascm/.percona
               else
@@ -1125,20 +1120,6 @@ su ${MAGE_WEB_USER} -s /bin/bash -c "php -f install.php -- \
 --admin_email "${MAGE_ADMIN_EMAIL}" \
 --admin_username "${MAGE_ADMIN_LOGIN}" \
 --admin_password '${MAGE_ADMIN_PASS}'"
-    echo
-    WHITETXT "============================================================================="
-    echo
-    GREENTXT "INSTALLED MAGENTO ${MAGE_SEL_VER} (${MAGE_VER}) WITHOUT SAMPLE DATA"
-    echo
-    WHITETXT "============================================================================="
-    WHITETXT " MAGENTO ADMIN ACCOUNT"
-    echo
-    echo "---> Admin path: ${MAGE_SITE_URL}admin_${MAGE_ADMIN_PATH_RANDOM}"
-    echo "---> Username: ${MAGE_ADMIN_LOGIN}"
-    echo "---> Password: ${MAGE_ADMIN_PASS}"
-    echo
-    WHITETXT "============================================================================="
- echo
 echo
 	else
 chmod u+x bin/magento
@@ -1168,7 +1149,13 @@ su ${MAGE_WEB_USER} -s /bin/bash -c "bin/magento setup:install --base-url=${MAGE
 --session-save=files \
 --use-rewrites=1"
 fi
-
+echo
+    WHITETXT "============================================================================="
+    echo
+    GREENTXT "INSTALLED MAGENTO ${MAGE_SEL_VER} (${MAGE_VER}) WITHOUT SAMPLE DATA"
+    echo
+    WHITETXT "============================================================================="
+echo
 cat >> /root/mascm/.mascm_index <<END
 mageadmin  ${MAGE_ADMIN_LOGIN}  ${MAGE_ADMIN_PASS}  ${MAGE_ADMIN_EMAIL}  ${MAGE_TIMEZONE}  ${MAGE_LOCALE} ${MAGE_ADMIN_PATH_RANDOM}
 END
@@ -1202,6 +1189,11 @@ echo "--------------------------------------------------------------------------
 BLUEBG "| POST-INSTALLATION CONFIGURATION |"
 echo "-------------------------------------------------------------------------------------"
 echo
+if [ "${MAGE_SEL_VER}" = "1" ]; then
+PUB_FOLDER="/"
+else
+PUB_FOLDER="/pub/"
+fi
 echo
 GREENTXT "SERVER HOSTNAME SETTINGS"
 hostnamectl set-hostname server.${MAGE_DOMAIN} --static
@@ -1358,10 +1350,10 @@ GREENTXT "VARNISH CACHE SETTINGS"
 fi
 echo
 GREENTXT "OPCACHE GUI, n98-MAGERUN, IMAGE OPTIMIZER, MYSQLTUNER, SSL DEBUG TOOLS"
-     cd ${MAGE_WEB_ROOT_PATH}
-     wget -qO tlstest_$(openssl rand 2 -hex).php ${REPO_MASCM_TMP}tlstest.php
-     wget -qO wesley.pl ${REPO_MASCM_TMP}wesley.pl
-     wget -qO mysqltuner.pl ${MYSQL_TUNER}
+     mkdir -p /opt/magento_saved_scripts
+     wget -qO /opt/magento_saved_scripts/tlstest_$(openssl rand 2 -hex).php ${REPO_MASCM_TMP}tlstest.php
+     wget -qO /usr/local/bin/wesley.pl ${REPO_MASCM_TMP}wesley.pl
+     wget -qO /usr/local/bin/mysqltuner ${MYSQL_TUNER}
 echo
 GREENTXT "SYSTEM AUTO UPDATE WITH YUM-CRON"
 sed -i '8s/.*/enabled=1/' /etc/yum.repos.d/remi-php70.repo
@@ -1381,20 +1373,11 @@ if [ "${DNS_A_RECORD}" != "${SERVER_IP_ADDR}" ] ; then
 	YELLOWTXT "Your servers ip address ${SERVER_IP_ADDR}"
 	YELLOWTXT "Domain ${MAGE_DOMAIN} resolves to ${DNS_A_RECORD}"
 	YELLOWTXT "Please change your DNS A record to this servers IP address, and run this command later: "
-	if [ "${MAGE_SEL_VER}" = "1" ]; then
-	WHITETXT "/usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH} -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}"
-	else
-	WHITETXT "/usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}/pub -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}"
-	fi
+	WHITETXT "/usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER} -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}"
 	echo  
     else
-    if [ "${MAGE_SEL_VER}" = "1" ]; then
-    /usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH} -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}
+    /usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER} -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}
     systemctl reload nginx
-    else
-    /usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}/pub -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}
-    systemctl reload nginx
-    fi
  fi
 echo '45 5 * * 1 root /usr/bin/certbot renew --quiet --renew-hook "systemctl reload nginx" >> /var/log/letsencrypt-renew.log' >> /etc/crontab
 echo
@@ -1462,7 +1445,7 @@ sed -i "/^Example/d" /etc/freshclam.conf
 sed -i "/^FRESHCLAM_DELAY/d" /etc/sysconfig/freshclam
 echo
 GREENTXT "GOACCESS REALTIME ACCESS LOG DASHBOARD"
-YELLOWTXT "goaccess access.log -o ${MAGE_WEB_ROOT_PATH}/access_report_${RANDOM}.html --real-time-html"
+YELLOWTXT "goaccess access.log -o ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER}access_report_${RANDOM}.html --real-time-html"
 cd /usr/local/src
 git clone https://github.com/allinurl/goaccess.git
 cd goaccess
@@ -1479,13 +1462,13 @@ if [ "${MAGE_SEL_VER}" = "1" ]; then
         echo "MAILTO=${MAGE_ADMIN_EMAIL}" >> magecron
         echo "* * * * * ! test -e ${MAGE_WEB_ROOT_PATH}/maintenance.flag && /bin/bash ${MAGE_WEB_ROOT_PATH}/cron.sh  > /dev/null" >> magecron
     else
-	echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento cron:run" >> magecron
-	echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/update/cron.php" >> magecron
-	echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento setup:cron:run" >> magecron		
+        echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento cron:run" >> magecron
+        echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/update/cron.php" >> magecron
+        echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento setup:cron:run" >> magecron		
 fi
-echo "*/5 * * * * /bin/bash ${MAGE_WEB_ROOT_PATH}/cron_check.sh" >> magecron
 crontab -u ${MAGE_WEB_USER} magecron
-echo "5 8 * * 7 perl ${MAGE_WEB_ROOT_PATH}/mysqltuner.pl --nocolor 2>&1 | mailx -E -s \"MYSQLTUNER WEEKLY REPORT at ${HOSTNAME}\" ${MAGE_ADMIN_EMAIL}" >> rootcron
+echo "*/5 * * * * /bin/bash /usr/local/bin/cron_check.sh" >> rootcron
+echo "5 8 * * 7 perl /usr/local/bin/mysqltuner --nocolor 2>&1 | mailx -E -s \"MYSQLTUNER WEEKLY REPORT at ${HOSTNAME}\" ${MAGE_ADMIN_EMAIL}" >> rootcron
 echo "30 23 * * * cd /var/log/nginx/; goaccess access.log -a -o access_log_report.html 2>&1 && echo | mailx -s \"Daily access log report at ${HOSTNAME}\" -a access_log_report.html ${MAGE_ADMIN_EMAIL}" >> rootcron
 crontab rootcron
 rm magecron
@@ -1645,38 +1628,33 @@ systemctl restart redis-6379.service
 systemctl restart redis-6380.service
 
 cd ${MAGE_WEB_ROOT_PATH}
-mkdir -p ../saved_scripts
 chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH%/*}
 GREENTXT "OPCACHE INVALIDATION MONITOR"
 OPCACHE_FILE=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z' | fold -w 12 | head -n 1)
-if [ "${MAGE_SEL_VER}" = "1" ]; then
-wget -qO ${MAGE_WEB_ROOT_PATH}/${OPCACHE_FILE}_opcache_gui.php https://raw.githubusercontent.com/magenx/opcache-gui/master/index.php
-cp ${OPCACHE_FILE}_opcache_gui.php ../saved_scripts/
-else
-wget -qO ${MAGE_WEB_ROOT_PATH}/pub/${OPCACHE_FILE}_opcache_gui.php https://raw.githubusercontent.com/magenx/opcache-gui/master/index.php
-cp pub/${OPCACHE_FILE}_opcache_gui.php ../saved_scripts/
-fi
-cat > ${MAGE_WEB_ROOT_PATH}/zend_opcache.sh <<END
+wget -qO /opt/magento_saved_scripts/${OPCACHE_FILE}_opcache_gui.php https://raw.githubusercontent.com/magenx/opcache-gui/master/index.php
+cp /opt/magento_saved_scripts/${OPCACHE_FILE}_opcache_gui.php ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER}
+echo
+cat > /usr/local/bin/zend_opcache.sh <<END
 #!/bin/bash
 ## monitor magento folder and invalidate opcache
 /usr/bin/inotifywait -e modify,move \\
     -mrq --timefmt %a-%b-%d-%T --format '%w%f %T' \\
-    --excludei '/(var|media|static|skin|tmp)/|\.(xml|html?|css|js|gif|jpe?g|png|ico|te?mp|txt|csv|swp|sql|t?gz|zip|svn?g|git|log|ini|sh|pl)~?' \\
+    --excludei '(\.swp|\.$(find ${MAGE_WEB_ROOT_PATH} -type f -name '*.*' | sed 's|.*\.||' | sort -u | grep -v ph | xargs | sed 's/ /|\\./g'))' \\
     ${MAGE_WEB_ROOT_PATH}/ | while read line; do
-    echo "\$line " >> /var/log/zend_opcache_monitor.log
+    echo "\$line " >> ${MAGE_WEB_ROOT_PATH}/var/log/zend_opcache_monitor.log
     FILE=\$(echo \${line} | cut -d' ' -f1 | sed -e 's/\/\./\//g' | cut -f1-2 -d'.')
     TARGETEXT="(php|phtml)"
     EXTENSION="\${FILE##*.}"
   if [[ "\$EXTENSION" =~ \$TARGETEXT ]];
     then
-    su ${MAGE_WEB_USER} -s /bin/bash -c "curl --cookie 'varnish_bypass=1' --silent http://${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php?page=invalidate&file=\${FILE} >/dev/null 2>&1"
+    su ${MAGE_WEB_USER} -s /bin/bash -c "curl --cookie 'varnish_bypass=1' --silent ${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php?page=invalidate&file=\${FILE} >/dev/null 2>&1"
   fi
 done
 END
 echo
 if [ "${MAGE_SEL_VER}" = "1" ]; then
 su ${MAGE_WEB_USER} -s /bin/bash -c "mkdir -p var/log"
-curl -s -o n98-magerun.phar https://files.magerun.net/n98-magerun.phar
+curl -s -o /usr/local/bin/n98-magerun https://files.magerun.net/n98-magerun.phar
 rm -rf index.php.sample LICENSE_AFL.txt LICENSE.html LICENSE.txt RELEASE_NOTES.txt php.ini.sample dev
 GREENTXT "CLEANING UP INDEXES LOCKS AND RUNNING RE-INDEX ALL"
 echo
@@ -1692,44 +1670,49 @@ su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento cache:disable"
 sed -i "s/report/report|${OPCACHE_FILE}_opcache_gui/" /etc/nginx/sites-available/magento2.conf
 systemctl restart php-fpm.service
 echo
-curl -s -o n98-magerun2.phar https://files.magerun.net/n98-magerun2.phar
+curl -s -o /usr/local/bin/n98-magerun2 https://files.magerun.net/n98-magerun2.phar
 chmod u+x bin/magento
 GREENTXT "SAVING COMPOSER JSON AND LOCK"
-cp composer.json ../saved_scripts/composer.json.saved
-cp composer.lock ../saved_scripts/composer.lock.saved
+cp composer.json ../composer.json.saved
+cp composer.lock ../composer.lock.saved
 fi
 echo
 GREENTXT "IMAGES OPTIMIZATION SCRIPT"
 echo
-cat >> ${MAGE_WEB_ROOT_PATH}/optimages.sh <<END
+cat >> /usr/local/bin/optimages.sh <<END
 #!/bin/bash
 ## monitor media folder and optimize new images
 /usr/bin/inotifywait -e create \\
     -mrq --timefmt %a-%b-%d-%T --format '%w%f %T' \\
-    --excludei '\.(xml|php|phtml|html?|css|js|ico|te?mp|txt|csv|swp|sql|t?gz|zip|svn?g|git|log|ini|opt|prog|crush)~?' \\
-    ${MAGE_WEB_ROOT_PATH}/pub/media | while read line; do
+    --excludei '(\.swp|\.$(find ${MAGE_WEB_ROOT_PATH} -type f -name '*.*' | sed 's|.*\.||' | sort -u |  grep -Eiv 'jpe?g|png' | xargs | sed 's/ /|\\./g'))' \\
+    ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER}media | while read line; do
     echo "\${line} " >> ${MAGE_WEB_ROOT_PATH}/var/log/images_optimization.log
     FILE=\$(echo \${line} | cut -d' ' -f1)
-    TARGETEXT="(jpg|jpeg|png|gif)"
+    TARGETEXT="(jpg|jpeg|png|JPG|gif)"
     EXTENSION="\${FILE##*.}"
   if [[ "\${EXTENSION}" =~ \${TARGETEXT} ]];
     then
-   su ${MAGE_WEB_USER} -s /bin/bash -c "${MAGE_WEB_ROOT_PATH}/wesley.pl \${FILE} >/dev/null 2>&1"
+   su ${MAGE_WEB_USER} -s /bin/bash -c "/usr/local/bin/wesley.pl \${FILE} >/dev/null 2>&1"
   fi
 done
 END
-cat >> ${MAGE_WEB_ROOT_PATH}/cron_check.sh <<END
+cat >> /usr/local/bin/cron_check.sh <<END
 #!/bin/bash
-pgrep optimages.sh > /dev/null || ${MAGE_WEB_ROOT_PATH}/optimages.sh &
-pgrep zend_opcache.sh > /dev/null || ${MAGE_WEB_ROOT_PATH}/zend_opcache.sh &
+## check opcache gui exists
+if [ ! -f "${MAGE_WEB_ROOT_PATH}${PUB_FOLDER}${OPCACHE_FILE}_opcache_gui.php" ]; then
+    cp /opt/magento_saved_scripts/${OPCACHE_FILE}_opcache_gui.php ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER}${OPCACHE_FILE}_opcache_gui.php
+    chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER}${OPCACHE_FILE}_opcache_gui.php
+fi
+## check if optimization scripts running
+pgrep optimages.sh > /dev/null || /usr/local/bin/optimages.sh &
+pgrep zend_opcache.sh > /dev/null || /usr/local/bin/zend_opcache.sh &
 END
 echo
 GREENTXT "FIXING PERMISSIONS"
 chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH}
 find . -type f -exec chmod 660 {} \;
 find . -type d -exec chmod 2770 {} \;
-chmod u+x wesley.pl mysqltuner.pl cron_check.sh zend_opcache.sh optimages.sh
-cp wesley.pl mysqltuner.pl cron_check.sh zend_opcache.sh optimages.sh ../saved_scripts/
+chmod +x /usr/local/bin/*
 echo
 echo
 echo "===========================  INSTALLATION LOG  ======================================"
@@ -1758,7 +1741,15 @@ WHITETXT "[ftp password]: ${MAGE_WEB_USER_PASS}"
 WHITETXT "[ftp allowed geoip]: ${USER_GEOIP}"
 WHITETXT "[ftp allowed ip]: ${USER_IP}"
 echo
-WHITETXT "[opcache gui]: ${OPCACHE_FILE}_opcache_gui.php"
+WHITETXT "[percona toolkit]: https://www.percona.com/doc/percona-toolkit/LATEST/index.html"
+WHITETXT "[database monitor]: /usr/local/bin/mytop"
+WHITETXT "[mysql tuner]: /usr/local/bin/mysqltuner"
+echo
+WHITETXT "[opcache gui]: ${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php"
+echo
+WHITETXT "[images optimization]: /usr/local/bin/optimages.sh + /usr/local/bin/wesley.pl"
+WHITETXT "[opcache invalidation]: /usr/local/bin/zend_opcache.sh + ${OPCACHE_FILE}_opcache_gui.php"
+WHITETXT "/usr/local/bin/cron_check.sh cronjob to keep above files running"
 echo
 echo
 echo "===========================  INSTALLATION LOG  ======================================"
