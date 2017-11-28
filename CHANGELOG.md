@@ -1,5 +1,14 @@
 # Change Log
 
+### RELEASE-20.8.0
+
+  * magento 1.9.3.7
+  * maldet monitoring disabled
+  * mwscan hourly cronjob
+  * opcache invalidation fixed
+  * images optimization fixed
+  * minor code cleanup
+
 ### RELEASE-20.7.0
 
   * install Percona 56 or 57
@@ -8,7 +17,7 @@
 ### RELEASE-20.6.0
 
   * stronger passwords
-  * varnish repo update
+  * varnish repo updated
   * minor code cleanup
 
 ### RELEASE-20.5.7
