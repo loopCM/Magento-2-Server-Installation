@@ -1745,6 +1745,12 @@ WHITETXT "[percona toolkit]: https://www.percona.com/doc/percona-toolkit/LATEST/
 WHITETXT "[database monitor]: /usr/local/bin/mytop"
 WHITETXT "[mysql tuner]: /usr/local/bin/mysqltuner"
 echo
+if [ "${MAGE_SEL_VER}" = "1" ]; then
+WHITETXT "[n98-magerun]: /usr/local/bin/n98-magerun"
+else
+WHITETXT "[n98-magerun]: /usr/local/bin/n98-magerun2"
+fi
+echo
 WHITETXT "[opcache gui]: ${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php"
 echo
 WHITETXT "[images optimization]: /usr/local/bin/optimages.sh + /usr/local/bin/wesley.pl"
