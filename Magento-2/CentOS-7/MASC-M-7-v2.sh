@@ -662,6 +662,33 @@ if [ "${repo_remi_install}" == "y" ];then
              GREENTXT "REDIS HAS BEEN INSTALLED"
              systemctl disable redis >/dev/null 2>&1
              echo
+cat > /etc/systemd/system/redis@.service << END
+[Unit]
+Description=Redis %i
+After=network.target
+OnFailure=service-status-mail@%n.service
+PartOf=redis.target
+
+[Service]
+Type=simple
+User=redis
+Group=redis
+PrivateTmp=true
+PIDFile=/var/run/redis-%i.pid
+ExecStart=/usr/bin/redis-server /etc/redis-%i.conf
+
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target redis.target
+END
+
+cat > /etc/systemd/system/redis.target << END
+[Unit]
+Description=Redis start/stop all redis@.service instances
+END
+
 for REDISPORT in 6379 6380
 do
 mkdir -p /var/lib/redis-${REDISPORT}
@@ -669,16 +696,12 @@ chmod 755 /var/lib/redis-${REDISPORT}
 chown redis /var/lib/redis-${REDISPORT}
 cp -rf /etc/redis.conf /etc/redis-${REDISPORT}.conf
 chmod 644 /etc/redis-${REDISPORT}.conf
-cp -rf /usr/lib/systemd/system/redis.service /etc/systemd/system/redis-${REDISPORT}.service
-sed -i "s/daemonize no/daemonize yes/"  /etc/redis-${REDISPORT}.conf
 sed -i "s/^bind 127.0.0.1.*/bind 127.0.0.1/"  /etc/redis-${REDISPORT}.conf
 sed -i "s/^dir.*/dir \/var\/lib\/redis-${REDISPORT}\//"  /etc/redis-${REDISPORT}.conf
 sed -i "s/^logfile.*/logfile \/var\/log\/redis\/redis-${REDISPORT}.log/"  /etc/redis-${REDISPORT}.conf
-sed -i "s/^pidfile.*/pidfile \/var\/run\/redis\/redis-${REDISPORT}.pid/"  /etc/redis-${REDISPORT}.conf
+sed -i "s/^pidfile.*/pidfile \/var\/run\/redis-${REDISPORT}.pid/"  /etc/redis-${REDISPORT}.conf
 sed -i "s/^port.*/port ${REDISPORT}/" /etc/redis-${REDISPORT}.conf
-sed -i "s/redis.conf/redis-${REDISPORT}.conf/" /etc/systemd/system/redis-${REDISPORT}.service
-sed -i "/^After.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/redis-${REDISPORT}.service
-sed -i "/\[Install\]/i Restart=on-failure\nRestartSec=10\n" /etc/systemd/system/redis-${REDISPORT}.service
+sed -i "s/dump.rdb/dump-${REDISPORT}.rdb/" /etc/redis-${REDISPORT}.conf
 done
 echo
 cat > /etc/sysconfig/memcached <<END
@@ -696,8 +719,8 @@ sed -i "/\[Install\]/i Restart=on-failure\nRestartSec=10\n" /etc/systemd/system/
 sed -i "/^After.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/searchd.service
 sed -i "/\[Install\]/i Restart=on-failure\nRestartSec=10\n" /etc/systemd/system/searchd.service
 systemctl daemon-reload
-systemctl enable redis-6379 >/dev/null 2>&1
-systemctl enable redis-6380 >/dev/null 2>&1
+systemctl enable redis@6379 >/dev/null 2>&1
+systemctl enable redis@6380 >/dev/null 2>&1
 systemctl enable memcached  >/dev/null 2>&1
                 else
                echo
@@ -1624,8 +1647,8 @@ echo
 systemctl daemon-reload
 systemctl restart nginx.service
 systemctl restart php-fpm.service
-systemctl restart redis-6379.service
-systemctl restart redis-6380.service
+systemctl restart redis@6379
+systemctl restart redis@6380
 
 cd ${MAGE_WEB_ROOT_PATH}
 chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH%/*}
