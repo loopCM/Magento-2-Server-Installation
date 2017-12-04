@@ -662,7 +662,7 @@ if [ "${repo_remi_install}" == "y" ];then
              GREENTXT "REDIS HAS BEEN INSTALLED"
              systemctl disable redis >/dev/null 2>&1
              echo
-cat > /etc/systemd/system/redis@.service << END
+cat > /etc/systemd/system/redis@.service <<END
 [Unit]
 Description=Redis %i
 After=network.target
@@ -684,7 +684,7 @@ RestartSec=10
 WantedBy=multi-user.target redis.target
 END
 
-cat > /etc/systemd/system/redis.target << END
+cat > /etc/systemd/system/redis.target <<END
 [Unit]
 Description=Redis start/stop all redis@.service instances
 END
