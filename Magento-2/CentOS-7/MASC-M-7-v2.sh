@@ -1800,9 +1800,9 @@ MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/mascm/.mascm_index)
 MAGE_ADMIN_EMAIL=$(awk '/mageadmin/ { print $4 }' /root/mascm/.mascm_index)
 YELLOWTXT "If you are going to use services like CloudFlare - install Fail2Ban"
 echo
-echo -n "---> Would you like to install CSF firewall(y) or Fail2Ban(n)? [y/n][n]:"
-read csf_test
-if [ "${csf_test}" == "y" ];then
+read -e -p "---> Would you like to install CSF firewall(csf) or Fail2Ban(f2b) or cancel (n): " -i "csf"  firewall_test
+read firewall_test
+if [ "${firewall_test}" == "csf" ];then
            echo
                GREENTXT "DOWNLOADING CSF FIREWALL"
                echo
@@ -1862,7 +1862,7 @@ if [ "${csf_test}" == "y" ];then
                    sed -i "/|0|/s/^#//g" /etc/csf/csf.blocklists
         csf -r
     fi
-    else
+    elif [ "${firewall_test}" == "f2b" ];then
     echo
     GREENTXT "FAIL2BAN INSTALLATION"
     echo
@@ -1874,6 +1874,10 @@ if [ "${csf_test}" == "y" ];then
     echo
     GREENTXT "FAIL2BAN HAS BEEN INSTALLED OK"
     echo
+            else
+          echo
+            YELLOWTXT "Firewall installation was skipped by the user. Next step"
+	    exit 1
 fi
 echo
 echo
