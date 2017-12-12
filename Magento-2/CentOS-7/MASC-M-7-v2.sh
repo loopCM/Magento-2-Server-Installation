@@ -1379,8 +1379,8 @@ GREENTXT "OPCACHE GUI, n98-MAGERUN, IMAGE OPTIMIZER, MYSQLTUNER, SSL DEBUG TOOLS
      wget -qO /usr/local/bin/mysqltuner ${MYSQL_TUNER}
 echo
 GREENTXT "SYSTEM AUTO UPDATE WITH YUM-CRON"
-sed -i '8s/.*/enabled=1/' /etc/yum.repos.d/remi-php70.repo
-sed -i '9s/.*/enabled=1/' /etc/yum.repos.d/remi.repo
+yum-config-manager --enable remi-php70
+yum-config-manager --enable remi
 sed -i 's/apply_updates = no/apply_updates = yes/' /etc/yum/yum-cron.conf
 sed -i "s/email_from = root@localhost/email_from = yum-cron@${MAGE_DOMAIN}/" /etc/yum/yum-cron.conf
 sed -i "s/email_to = root/email_to = ${MAGE_ADMIN_EMAIL}/" /etc/yum/yum-cron.conf
