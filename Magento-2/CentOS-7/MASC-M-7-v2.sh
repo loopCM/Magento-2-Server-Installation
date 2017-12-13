@@ -505,12 +505,12 @@ if [ "${repo_percona_install}" == "y" ];then
               cp /usr/lib/systemd/system/mysqld.service /etc/systemd/system/mysqld.service
               sed -i "s/^Restart=always/Restart=on-failure/" /etc/systemd/system/mysqld.service
               sed -i "s/^Restart=always/Restart=on-failure/" /etc/systemd/system/mysql.service
-              sed -i "/^After.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/mysqld.service
-              sed -i "/^After.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/mysql.service
+              sed -i "/^After=syslog.target.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/mysqld.service
+              sed -i "/^After=syslog.target.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/mysql.service
               sed -i "/Restart=on-failure/a RestartSec=10" /etc/systemd/system/mysqld.service
               sed -i "/Restart=on-failure/a RestartSec=10" /etc/systemd/system/mysql.service
               systemctl daemon-reload
-              systemctl enable mysql >/dev/null 2>&1
+              systemctl enable mysqld >/dev/null 2>&1
               echo
               WHITETXT "Downloading my.cnf file from MagenX Github repository"
               wget -qO /etc/my.cnf https://raw.githubusercontent.com/magenx/magento-mysql/master/my.cnf/my.cnf
@@ -1008,7 +1008,7 @@ printf "\033c"
 WHITETXT "============================================================================="
 GREENTXT "MAGENTO DATABASE AND DATABASE USER"
 echo
-systemctl start mysql.service
+systemctl start mysqld.service
 PERCONA_VER=$(cat /root/mascm/.percona)
 MAGE_SEL_VER=$(awk '/webshop/ { print $6 }' /root/mascm/.mascm_index)
 MYSQL_ROOT_PASS_GEN=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
