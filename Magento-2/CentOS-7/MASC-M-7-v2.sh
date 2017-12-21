@@ -504,11 +504,8 @@ if [ "${repo_percona_install}" == "y" ];then
               ## plug in service status alert
               cp /usr/lib/systemd/system/mysqld.service /etc/systemd/system/mysqld.service
               sed -i "s/^Restart=always/Restart=on-failure/" /etc/systemd/system/mysqld.service
-              sed -i "s/^Restart=always/Restart=on-failure/" /etc/systemd/system/mysql.service
               sed -i "/^After=syslog.target.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/mysqld.service
-              sed -i "/^After=syslog.target.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/mysql.service
               sed -i "/Restart=on-failure/a RestartSec=10" /etc/systemd/system/mysqld.service
-              sed -i "/Restart=on-failure/a RestartSec=10" /etc/systemd/system/mysql.service
               systemctl daemon-reload
               systemctl enable mysqld >/dev/null 2>&1
               echo
