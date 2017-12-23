@@ -1,5 +1,11 @@
 # Change Log
 
+### RELEASE-20.8.1
+  
+  * mysql systemd double config removed
+  * mysqld.service config cleanup
+  * minor code cleanup
+  
 ### RELEASE-20.8.0
 
   * magento 1.9.3.7
