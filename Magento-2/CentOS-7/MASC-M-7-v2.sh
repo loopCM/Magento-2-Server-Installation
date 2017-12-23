@@ -1393,10 +1393,10 @@ if [ "${DNS_A_RECORD}" != "${SERVER_IP_ADDR}" ] ; then
 	YELLOWTXT "Your servers ip address ${SERVER_IP_ADDR}"
 	YELLOWTXT "Domain ${MAGE_DOMAIN} resolves to ${DNS_A_RECORD}"
 	YELLOWTXT "Please change your DNS A record to this servers IP address, and run this command later: "
-	WHITETXT "/usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER} -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}"
+	WHITETXT "/usr/bin/certbot certonly --agree-tos --no-eff-email --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER} -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}"
 	echo  
     else
-    /usr/bin/certbot certonly --agree-tos --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER} -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}
+    /usr/bin/certbot certonly --agree-tos --no-eff-email --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER} -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}
     systemctl reload nginx
  fi
 echo '45 5 * * 1 root /usr/bin/certbot renew --quiet --renew-hook "systemctl reload nginx" >> /var/log/letsencrypt-renew.log' >> /etc/crontab
