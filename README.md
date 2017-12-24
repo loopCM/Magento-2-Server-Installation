@@ -3,6 +3,15 @@
 MASC-M<sup>™</sup>
 ======
 
+DEMO: https://demo.magenx.com
+
+SSL CONFIGURATION:
+![SSL CONFIGURATION](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/demo-ssl-a%2B.png)
+
+GOOGLE PAGESPEED:
+![GOOGLE PAGESPEED](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/pagespeed-green.jpg.png)
+
+
 ---->> Magento **1.9.3.x**<br/>
 ---->> Magento **2.2.x**
 
