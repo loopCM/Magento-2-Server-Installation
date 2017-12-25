@@ -8,6 +8,9 @@ DEMO: https://demo.magenx.com
 SSL CONFIGURATION:
 ![SSL CONFIGURATION](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/demo-ssl-a%2B.png)
 
+GTMETRIX:
+![GTMETRIX](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/gtmetrix.png)
+
 GOOGLE PAGESPEED:
 ![GOOGLE PAGESPEED](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/pagespeed-green.jpg.png)
 
