@@ -26,7 +26,7 @@ Get a fully pre-configured server with Magento and LEMP stack in just 15 minutes
 
 Magento installation including: <br/>
 - WEBMIN CONTROL PANEL
-- HHVM
+- HHVM (not compatible with php 7.+ code)
 - VARNISH
 - NGINX
 - [PAGESPEED](https://github.com/pagespeed/ngx_pagespeed)
@@ -36,7 +36,8 @@ Magento installation including: <br/>
 - PROFTPD (custom port + ssl)
 - [MALWARE REALTIME MONITOR (quarantine)](https://github.com/rfxn/linux-malware-detect)
 - CLAMAV ENGINE
-- PERCONA (5.6)
+- [MWSCAN](https://github.com/gwillem/magento-malware-scanner)
+- PERCONA (5.6 5.7)
 - PERCONA TOOL-KIT
 - [MYSQLTUNER (+ weekly reports to admin email)](https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl)
 - MYTOP
