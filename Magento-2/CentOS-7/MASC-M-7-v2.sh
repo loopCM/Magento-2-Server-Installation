@@ -1415,7 +1415,7 @@ ${MAGE_WEB_ROOT_PATH}/var/log/*.log
 su root root
 create 640 ${MAGE_WEB_USER} ${MAGE_WEB_USER}
 weekly
-rotate 4
+rotate 2
 notifempty
 missingok
 compress
@@ -1723,6 +1723,8 @@ if [ ! -f "${MAGE_WEB_ROOT_PATH}${PUB_FOLDER}${OPCACHE_FILE}_opcache_gui.php" ];
     cp /opt/magento_saved_scripts/${OPCACHE_FILE}_opcache_gui.php ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER}${OPCACHE_FILE}_opcache_gui.php
     chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH}${PUB_FOLDER}${OPCACHE_FILE}_opcache_gui.php
 fi
+## check magento cli permissions
+chmod u+x ${MAGE_WEB_ROOT_PATH}/bin/magento
 ## check if optimization scripts running
 pgrep optimages.sh > /dev/null || /usr/local/bin/optimages.sh &
 pgrep zend_opcache.sh > /dev/null || /usr/local/bin/zend_opcache.sh &
