@@ -1376,13 +1376,13 @@ GREENTXT "OPCACHE GUI, n98-MAGERUN, IMAGE OPTIMIZER, MYSQLTUNER, SSL DEBUG TOOLS
      wget -qO /usr/local/bin/mysqltuner ${MYSQL_TUNER}
 echo
 GREENTXT "SYSTEM AUTO UPDATE WITH YUM-CRON"
-yum-config-manager --enable remi-php70
-yum-config-manager --enable remi
+yum-config-manager --enable remi-php70 >/dev/null 2>&1
+yum-config-manager --enable remi >/dev/null 2>&1
 sed -i 's/apply_updates = no/apply_updates = yes/' /etc/yum/yum-cron.conf
 sed -i "s/email_from = root@localhost/email_from = yum-cron@${MAGE_DOMAIN}/" /etc/yum/yum-cron.conf
 sed -i "s/email_to = root/email_to = ${MAGE_ADMIN_EMAIL}/" /etc/yum/yum-cron.conf
-systemctl enable yum-cron
-systemctl restart yum-cron
+systemctl enable yum-cron >/dev/null 2>&1
+systemctl restart yum-cron >/dev/null 2>&1
 echo
 GREENTXT "LETSENCRYPT SSL CERTIFICATE REQUEST"
 DNS_A_RECORD=$(getent hosts ${MAGE_DOMAIN} | awk '{ print $1 }')
@@ -1684,9 +1684,9 @@ echo
 	else
 GREENTXT "DISABLE MAGENTO CACHE AND ENABLE DEVELOPER MODE"
 rm -rf var/*
-su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento deploy:mode:set developer"
-su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento cache:flush"
-su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento cache:disable"
+su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento deploy:mode:set developer --quiet"
+su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento cache:flush --quiet"
+su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento cache:disable --quiet"
 sed -i "s/report/report|${OPCACHE_FILE}_opcache_gui/" /etc/nginx/sites-available/magento2.conf
 systemctl restart php-fpm.service
 echo
