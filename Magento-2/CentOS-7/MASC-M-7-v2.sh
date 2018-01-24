@@ -736,31 +736,31 @@ fi
 echo
 WHITETXT "============================================================================="
 echo
-echo -n "---> Start Varnish 4.1.x installation? [y/n][n]:"
+echo -n "---> Start Varnish cache installation? [y/n][n]:"
 read varnish_install
 if [ "${varnish_install}" == "y" ];then
           echo
-            GREENTXT "Installation of Varnish package:"
+            read -e -p "---> Select Varnish cache version to install 41 or 52: " -i "52"  VARNISH_VER
             echo
-cat >> /etc/yum.repos.d/varnishcache_varnish41.repo <<END
-[varnishcache_varnish41]
-name=varnishcache_varnish41
-baseurl=https://packagecloud.io/varnishcache/varnish41/el/7/x86_64
+cat >> /etc/yum.repos.d/varnishcache_varnish${VARNISH_VER}.repo <<END
+[varnishcache_varnish${VARNISH_VER}]
+name=varnishcache_varnish${VARNISH_VER}
+baseurl=https://packagecloud.io/varnishcache/varnish${VARNISH_VER}/el/7/x86_64
 repo_gpgcheck=1
 gpgcheck=0
 enabled=1
-gpgkey=https://packagecloud.io/varnishcache/varnish41/gpgkey
+gpgkey=https://packagecloud.io/varnishcache/varnish${VARNISH_VER}/gpgkey
 sslverify=1
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 metadata_expire=300
 
-[varnishcache_varnish41-source]
-name=varnishcache_varnish41-source
-baseurl=https://packagecloud.io/varnishcache/varnish41/el/7/SRPMS
+[varnishcache_varnish${VARNISH_VER}-source]
+name=varnishcache_varnish${VARNISH_VER}-source
+baseurl=https://packagecloud.io/varnishcache/varnish${VARNISH_VER}/el/7/SRPMS
 repo_gpgcheck=1
 gpgcheck=0
 enabled=1
-gpgkey=https://packagecloud.io/varnishcache/varnish41/gpgkey
+gpgkey=https://packagecloud.io/varnishcache/varnish${VARNISH_VER}/gpgkey
 sslverify=1
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 metadata_expire=300
@@ -777,7 +777,7 @@ END
 	    wget -qO /etc/systemd/system/varnish.service ${REPO_MASCM_TMP}varnish.service
             wget -qO /etc/varnish/varnish.params ${REPO_MASCM_TMP}varnish.params
             systemctl daemon-reload >/dev/null 2>&1
-            GREENTXT "VARNISH HAS BEEN INSTALLED  -  OK"
+            GREENTXT "VARNISH ${VARNISH_VER} HAS BEEN INSTALLED  -  OK"
                else
               echo
             REDTXT "VARNISH INSTALLATION ERROR"
@@ -990,9 +990,13 @@ WHITETXT "======================================================================
 GREENTXT "      == MAGENTO DOWNLOADED AND READY FOR INSTALLATION =="
 WHITETXT "============================================================================="
 mkdir -p /root/mascm/
+if [ -f /root/mascm/.mascm_index ]; then
+sed -i "s,webshop.*,webshop ${MAGE_DOMAIN}    ${MAGE_WEB_ROOT_PATH}    ${MAGE_WEB_USER}   ${MAGE_WEB_USER_PASS}  ${MAGE_SEL_VER}  ${!MAGE_VER}," /root/mascm/.mascm_index
+else
 cat >> /root/mascm/.mascm_index <<END
 webshop ${MAGE_DOMAIN}    ${MAGE_WEB_ROOT_PATH}    ${MAGE_WEB_USER}   ${MAGE_WEB_USER_PASS}  ${MAGE_SEL_VER}  ${!MAGE_VER}
 END
+fi
 echo
 pause '------> Press [Enter] key to show menu'
 printf "\033c"
