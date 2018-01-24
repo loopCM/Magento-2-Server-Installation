@@ -1172,6 +1172,8 @@ su ${MAGE_WEB_USER} -s /bin/bash -c "bin/magento setup:install --base-url=${MAGE
 --cleanup-database \
 --session-save=files \
 --use-rewrites=1"
+
+mysqldump --single-transaction --routines --triggers --events ${MAGE_DB_NAME} | gzip > /root/${MAGE_DB_NAME}.sql.gz
 fi
 echo
     WHITETXT "============================================================================="
@@ -1486,9 +1488,9 @@ if [ "${MAGE_SEL_VER}" = "1" ]; then
         echo "MAILTO=${MAGE_ADMIN_EMAIL}" >> magecron
         echo "* * * * * ! test -e ${MAGE_WEB_ROOT_PATH}/maintenance.flag && /bin/bash ${MAGE_WEB_ROOT_PATH}/cron.sh  > /dev/null" >> magecron
     else
-        echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento cron:run" >> magecron
-        echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/update/cron.php" >> magecron
-        echo "* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento setup:cron:run" >> magecron		
+        echo "#* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento cron:run" >> magecron
+        echo "#* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/update/cron.php" >> magecron
+        echo "#* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento setup:cron:run" >> magecron		
 fi
 crontab -u ${MAGE_WEB_USER} magecron
 echo "*/5 * * * * /bin/bash /usr/local/bin/cron_check.sh" >> rootcron
@@ -1777,12 +1779,18 @@ else
 WHITETXT "[n98-magerun]: /usr/local/bin/n98-magerun2"
 fi
 echo
-WHITETXT "[opcache gui]: ${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php"
-echo
 WHITETXT "[images optimization]: /usr/local/bin/optimages.sh + /usr/local/bin/wesley.pl"
+WHITETXT "[opcache gui]: ${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php"
 WHITETXT "[opcache invalidation]: /usr/local/bin/zend_opcache.sh + ${OPCACHE_FILE}_opcache_gui.php"
-WHITETXT "/usr/local/bin/cron_check.sh cronjob to keep above files running"
+WHITETXT "[cronjob]: /usr/local/bin/cron_check.sh - to keep above files running"
 echo
+WHITETXT "[redis on port 6379]: systemctl restart redis@6379"
+WHITETXT "[redis on port 6380]: systemctl restart redis@6380"
+echo
+if [ "${MAGE_SEL_VER}" = "2" ]; then
+WHITETXT "[crontab]: in case of migration magento 2 cron disabled. enable it if no migration."
+WHITETXT "[installed db dump]: /root/${MAGE_DB_NAME}.sql.gz"
+fi
 echo
 echo "===========================  INSTALLATION LOG  ======================================"
 echo
