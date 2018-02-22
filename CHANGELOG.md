@@ -1,5 +1,15 @@
 # Change Log
 
+### RELEASE-21.0.0
+  
+  * magento 2 only
+  * hhvm removed
+  * percona database version 5.7
+  * php version 7.1.x
+  * varnish version 5.2
+  * wazuh (ossec) + ELK stack upgraded
+  * minor code cleanup
+
 ### RELEASE-20.8.1
   
   * mysql systemd double config removed
