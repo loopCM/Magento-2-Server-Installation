@@ -187,32 +187,6 @@ if [[ ${RESULT} == up ]]; then
   echo
   exit 1
 fi
-        MD5_NEW=$(curl -sL ${MASCM_BASE} > MASCM_NEW && md5sum MASCM_NEW | awk '{print $1}')
-        MD5_OLD=$(md5sum ${SELF} | awk '{print $1}')
-            if [[ "${MD5_NEW}" == "${MD5_OLD}" ]]; then
-            GREENTXT "PASS: INTEGRITY CHECK FOR '${SELF}' OK"
-            rm MASCM_NEW
-            elif [[ "${MD5_NEW}" != "${MD5_OLD}" ]]; then
-            echo
-            YELLOWTXT "INTEGRITY CHECK FOR '${SELF}'"
-            YELLOWTXT "DETECTED DIFFERENT MD5 CHECKSUM"
-            YELLOWTXT "REMOTE REPOSITORY FILE HAS SOME CHANGES"
-            REDTXT "IF YOU HAVE LOCAL CHANGES - SKIP UPDATES"
-            echo
-                echo -n "---> Would you like to update the file now?  [y/n][y]:"
-		read update_agree
-		if [ "${update_agree}" == "y" ];then
-		mv MASCM_NEW ${SELF}
-		echo
-                GREENTXT "THE FILE HAS BEEN UPGRADED, PLEASE RUN IT AGAIN"
-		echo
-                exit 1
-            else
-        echo
-        YELLOWTXT "NEW FILE SAVED TO MASCM_NEW"
-        echo
-  fi
-fi
 
 # do we have CentOS 7?
 if grep "CentOS.* 7\." /etc/centos-release  > /dev/null 2>&1; then
