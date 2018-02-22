@@ -982,8 +982,8 @@ MAGE_DB_PASS="${MAGE_DB_PASS_GEN}${RANDOM}#"
 echo
 echo
 read -e -p "---> Enter Magento database host : " -i "localhost" MAGE_DB_HOST
-read -e -p "---> Enter Magento database name : " -i "m${MAGE_VERSION}_$(openssl rand 2 -hex)_master" MAGE_DB_NAME
-read -e -p "---> Enter Magento database user : " -i "m${MAGE_VERSION}_$(openssl rand 2 -hex)_user" MAGE_DB_USER_NAME
+read -e -p "---> Enter Magento database name : " -i "m${MAGE_VERSION}d_$(openssl rand 2 -hex)_master" MAGE_DB_NAME
+read -e -p "---> Enter Magento database user : " -i "m${MAGE_VERSION}u_$(openssl rand 2 -hex)_user" MAGE_DB_USER_NAME
 echo
 echo
 pause '------> Press [Enter] key to create MySQL database and user'
