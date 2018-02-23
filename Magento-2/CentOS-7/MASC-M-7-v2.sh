@@ -243,7 +243,7 @@ fi
 
 # some selinux, sir?
 if [ -f "/etc/selinux/config" ]; then
-SELINUX=$(sestatus | awk '/Current mode:/ {print $3}')
+SELINUX=$(awk -F "=" '/^SELINUX=/ {print $2}' /etc/selinux/config)
 if [[ ! "${SELINUX}" =~ (disabled|permissive) ]]; then
   echo
   REDTXT "ERROR: SELINUX IS NOT DISABLED OR PERMISSIVE"
