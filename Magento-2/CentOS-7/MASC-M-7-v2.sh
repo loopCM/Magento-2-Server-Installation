@@ -628,7 +628,7 @@ if [ "${repo_remi_install}" == "y" ];then
              systemctl daemon-reload
              systemctl enable php-fpm >/dev/null 2>&1
              systemctl disable httpd >/dev/null 2>&1
-             yum list installed | awk '/php.*x86_64/ {print "      ",$1}'
+             rpm -qa 'php*' | awk '{print "  Installed: ",$1}'
                 else
                echo
              REDTXT "PHP INSTALLATION ERROR"
