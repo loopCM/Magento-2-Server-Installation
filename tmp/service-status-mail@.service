@@ -4,6 +4,6 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/bin/service-status-mail.sh %I
+ExecStart=/usr/local/bin/service-status-mail.sh %I
 ExecStop=
 KillMode=none
