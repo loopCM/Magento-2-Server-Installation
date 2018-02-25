@@ -1,22 +1,21 @@
 #!/bin/bash
-#====================================================================#
-#        Automated Server Configuration for Magento 2                #
-#        Copyright (C) 2018 admin@magenx.com                         #
-#        All rights reserved.                                        #
-#====================================================================#
+#=================================================================================#
+#        Automated Server Configuration for Magento 2                             #
+#        Copyright (C) 2018 admin@magenx.com                                      #
+#        All rights reserved.                                                     #
+#=================================================================================#
 SELF=$(basename $0)
 MASCM_VER="21.0.0"
 MASCM_BASE="https://masc.magenx.com"
 
-### DEFINE LINKS AND PACKAGES STARTS ###
+###################################################################################
+###                       DEFINE LINKS AND PACKAGES STARTS                      ###
+###################################################################################
 
-# Software versions
 # Magento
 MAGE_VERSION="2"
 MAGE_VERSION_FULL=$(curl -s https://api.github.com/repos/magento/magento2/tags 2>&1 | head -3 | grep -oP '(?<=")\d.*(?=")')
 REPO_MAGE="composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition"
-
-REPO_MASCM_TMP="https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/tmp/"
 
 # Webmin Control Panel plugins:
 WEBMIN_NGINX="https://github.com/magenx/webmin-nginx/archive/nginx-0.08.wbm__0.tar.gz"
@@ -35,6 +34,7 @@ PERL_MODULES=(LWP-Protocol-https libwww-perl CPAN Template-Toolkit Time-HiRes Ex
 SPHINX="http://sphinxsearch.com/files/sphinx-2.2.11-1.rhel7.x86_64.rpm"
 
 # Nginx extra configuration
+REPO_MASCM_TMP="https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/tmp/"
 NGINX_VERSION=$(curl -s http://nginx.org/en/download.html | grep -oP '(?<=gz">nginx-).*?(?=</a>)' | head -1)
 NGINX_BASE="https://raw.githubusercontent.com/magenx/Magento-nginx-config/master/"
 NGINX_EXTRA_CONF="assets.conf error_page.conf extra_protect.conf export.conf status.conf setup.conf php_backend.conf maps.conf phpmyadmin.conf maintenance.conf"
@@ -43,27 +43,28 @@ NGINX_EXTRA_CONF="assets.conf error_page.conf extra_protect.conf export.conf sta
 MYSQL_TUNER="https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl"
 MYSQL_TOP="https://launchpad.net/ubuntu/+archive/primary/+files/mytop_1.9.1.orig.tar.gz"
 
-### DEFINE LINKS AND PACKAGES ENDS ###
+###################################################################################
+###                                    COLORS                                   ###
+###################################################################################
 
-# Simple colors
 RED="\e[31;40m"
 GREEN="\e[32;40m"
 YELLOW="\e[33;40m"
 WHITE="\e[37;40m"
 BLUE="\e[0;34m"
-
-# Background
+### Background
 DGREYBG="\t\t\e[100m"
 BLUEBG="\e[44m"
 REDBG="\t\t\e[41m"
-
-# Styles
+### Styles
 BOLD="\e[1m"
-
-# Reset
+### Reset
 RESET="\e[0m"
 
-# quick-n-dirty settings
+###################################################################################
+###                            MESSAGES ECHO DESIGN                             ###
+###################################################################################
+
 function WHITETXT() {
         MESSAGE=${@:-"${RESET}Error: No message passed"}
         echo -e "\t\t${WHITE}${MESSAGE}${RESET}"
@@ -89,10 +90,13 @@ function BLUEBG() {
         echo -e "${BLUEBG}${MESSAGE}${RESET}"
 }
 
+###################################################################################
+###                            PROGRESS BAR AND PAUSE                           ###
+###################################################################################
+
 function pause() {
    read -p "$*"
 }
-
 function start_progress {
   while true
   do
@@ -100,7 +104,6 @@ function start_progress {
     sleep 1
   done
 }
-
 function quick_progress {
   while true
   do
@@ -108,7 +111,6 @@ function quick_progress {
     sleep 0.05
   done
 }
-
 function long_progress {
   while true
   do
@@ -116,12 +118,15 @@ function long_progress {
     sleep 3
   done
 }
-
 function stop_progress {
 kill $1
 wait $1 2>/dev/null
 echo -en "\n"
 }
+
+###################################################################################
+###                            ARROW KEYS UP/DOWN MENU                          ###
+###################################################################################
 
 updown_menu () {
 i=1;for items in $(echo $1); do item[$i]="${items}"; let i=$i+1; done
@@ -149,11 +154,11 @@ while [ 0 ]; do
   esac
 done }
 
-
 clear
 ###################################################################################
-#                                     START CHECKS                                #
+###                                  START CHECKS                               ###
 ###################################################################################
+
 echo
 echo
 # root?
@@ -164,6 +169,22 @@ if [[ ${EUID} -ne 0 ]]; then
   exit 1
   else
   GREENTXT "PASS: ROOT!"
+fi
+
+# check if webstack is clean
+if ! grep -q "webstack_is_clean" /root/mascm/.webstack >/dev/null 2>&1 ; then
+installed_packages="$(rpm -qa --qf '%{name}\n' 'mysqld?|Percona*|maria*|php-?|nginx*|*ftp*|varnish*|certbot*|redis*|webmin')"
+  if [ ! -z "$installed_packages" ]; then
+  REDTXT  "ERROR: WEBSTACK PACKAGES ALREADY INSTALLED"
+  YELLOWTXT "------> YOU NEED TO REMOVE THEM OR RE-INSTALL MINIMAL OS VERSION"
+  echo
+  echo "${installed_packages[@]}" | awk '{print "               ",$1}'
+  echo
+  echo
+  exit 1
+    else
+  echo "webstack_is_clean" > /root/mascm/.webstack
+  fi
 fi
 
 # network is up?
@@ -255,9 +276,7 @@ if [[ ! "${SELINUX}" =~ (disabled|permissive) ]]; then
 fi
 fi
 echo
-if grep -q "yes" /root/mascm/.systest >/dev/null 2>&1 ; then
-  BLUETXT "the systems test has been made already"
-  else
+if ! grep -q "yes" /root/mascm/.systest >/dev/null 2>&1 ; then
 echo "-------------------------------------------------------------------------------------"
 BLUEBG "| QUICK SYSTEM TEST |"
 echo "-------------------------------------------------------------------------------------"
@@ -272,10 +291,8 @@ echo
     cname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo )
     cores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
     freq=$( awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo )
-    tram=$( free -m | awk 'NR==2 {print $2}' )
-    
-    echo
-    
+    tram=$( free -m | awk 'NR==2 {print $2}' )   
+    echo  
     echo -n "     PROCESSING I/O PERFORMANCE "
     start_progress &
     pid="$!"
@@ -325,9 +342,8 @@ pause "---> Press [Enter] key to proceed"
 echo
 fi
 echo
-if grep -q "yes" /root/mascm/.sshport >/dev/null 2>&1 ; then
-BLUETXT "ssh port has been changed already"
-else
+# ssh test
+if ! grep -q "yes" /root/mascm/.sshport >/dev/null 2>&1 ; then
 if grep -q "Port 22" /etc/ssh/sshd_config >/dev/null 2>&1 ; then
 REDTXT "DEFAULT SSH PORT :22 DETECTED"
 echo
@@ -377,13 +393,13 @@ fi
 fi
 echo
 echo
+
 ###################################################################################
-#                                     CHECKS END                                  #
+###                                  AGREEMENT                                  ###
 ###################################################################################
+
 echo
-if grep -q "yes" /root/mascm/.terms >/dev/null 2>&1 ; then
-  echo ""
-  else
+if ! grep -q "yes" /root/mascm/.terms >/dev/null 2>&1 ; then
   YELLOWTXT "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
   echo
   YELLOWTXT "BY INSTALLING THIS SOFTWARE AND BY USING ANY AND ALL SOFTWARE"
@@ -405,9 +421,11 @@ if grep -q "yes" /root/mascm/.terms >/dev/null 2>&1 ; then
     exit 1
   fi
 fi
+
 ###################################################################################
-#                                  HEADER MENU START                              #
+###                                  MAIN MENU                                  ###
 ###################################################################################
+
 showMenu () {
 printf "\033c"
     echo
@@ -441,9 +459,12 @@ do
                 "lemp")
 echo
 echo
-if grep -q "yes" /root/mascm/.sysupdate >/dev/null 2>&1 ; then
-echo
-else
+
+###################################################################################
+###                                  SYSTEM UPGRADE                             ###
+###################################################################################
+
+if ! grep -q "yes" /root/mascm/.sysupdate >/dev/null 2>&1 ; then
 ## install all extra packages
 GREENTXT "SYSTEM PACKAGES INSTALLATION. PLEASE WAIT"
 yum -q -y upgrade >/dev/null 2>&1
@@ -895,10 +916,12 @@ echo
 pause '------> Press [Enter] key to show the menu'
 printf "\033c"
 ;;
+
+###################################################################################
+###                                  MAGENTO DOWNLOAD                           ###
+###################################################################################
+
 "magento")
-###################################################################################
-#                                MAGENTO                                          #
-###################################################################################
 echo
 echo "-------------------------------------------------------------------------------------"
 BLUEBG "|   DOWNLOAD MAGENTO ${MAGE_VERSION} (${MAGE_VERSION_FULL})                                            |"
@@ -942,13 +965,15 @@ echo
 pause '------> Press [Enter] key to show menu'
 printf "\033c"
 ;;
+
 ###################################################################################
-#                                MAGENTO DATABASE SETUP                           #
+###                                  DATABASE SETUP                             ###
 ###################################################################################
+
 "database")
 printf "\033c"
 WHITETXT "============================================================================="
-GREENTXT "MAGENTO DATABASE AND DATABASE USER"
+GREENTXT "CRAETE MAGENTO DATABASE AND DATABASE USER"
 echo
 if [ ! -f /root/.my.cnf ]; then
 systemctl start mysqld.service
@@ -1003,9 +1028,11 @@ echo
 pause '------> Press [Enter] key to show menu'
 printf "\033c"
 ;;
+
 ###################################################################################
-#                                MAGENTO INSTALLATION                             #
+###                               MAGENTO IINSTALLATION                         ###
 ###################################################################################
+
 "install")
 printf "\033c"
 MAGE_VERSION=$(awk '/webshop/ { print $6 }' /root/mascm/.mascm_index)
@@ -1087,9 +1114,11 @@ END
 pause '------> Press [Enter] key to show menu'
 printf "\033c"
 ;;
+
 ###################################################################################
-#                                SYSTEM CONFIGURATION                             #
+###                                FINAL CONFIGURATION                          ###
 ###################################################################################
+
 "config")
 printf "\033c"
 MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/mascm/.mascm_index)
@@ -1271,10 +1300,10 @@ END
 echo
 GREENTXT "SERVICE STATUS WITH E-MAIL ALERTING"
 wget -qO /etc/systemd/system/service-status-mail@.service ${REPO_MASCM_TMP}service-status-mail@.service
-wget -qO /bin/service-status-mail.sh ${REPO_MASCM_TMP}service-status-mail.sh
-sed -i "s/MAGEADMINEMAIL/${MAGE_ADMIN_EMAIL}/" /bin/service-status-mail.sh
-sed -i "s/DOMAINNAME/${MAGE_DOMAIN}/" /bin/service-status-mail.sh
-chmod u+x /bin/service-status-mail.sh
+wget -qO /usr/local/bin/service-status-mail.sh ${REPO_MASCM_TMP}service-status-mail.sh
+sed -i "s/MAGEADMINEMAIL/${MAGE_ADMIN_EMAIL}/" /usr/local/bin/service-status-mail.sh
+sed -i "s/DOMAINNAME/${MAGE_DOMAIN}/" /usr/local/bin/service-status-mail.sh
+chmod u+x /usr/local/bin/service-status-mail.sh
 systemctl daemon-reload
 echo
 GREENTXT "MAGENTO MALWARE SCANNER"
@@ -1531,6 +1560,8 @@ WHITETXT "[opcache gui]: ${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php"
 WHITETXT "[opcache invalidation]: /usr/local/bin/zend_opcache.sh + ${OPCACHE_FILE}_opcache_gui.php"
 WHITETXT "[cronjob]: /usr/local/bin/cron_check.sh - to keep above files running"
 echo
+WHITETXT "[service alert]: /usr/local/bin/service-status-mail.sh"
+echo
 WHITETXT "[redis on port 6379]: systemctl restart redis@6379"
 WHITETXT "[redis on port 6380]: systemctl restart redis@6380"
 echo
@@ -1546,9 +1577,11 @@ echo "--------------------------------------------------------------------------
 echo
 pause '---> Press [Enter] key to show menu'
 ;;
+
 ###################################################################################
-#                          INSTALLING CSF FIREWALL                                #
+###                               FIREWALL INSTALLATION                         ###
 ###################################################################################
+
 "firewall")
 WHITETXT "============================================================================="
 echo
@@ -1639,9 +1672,11 @@ echo
 echo
 pause '---> Press [Enter] key to show menu'
 ;;
+
 ###################################################################################
-#                               WEBMIN HERE YOU GO                                #
+###                                  WEBMIN INSTALLATION                        ###
 ###################################################################################
+
 "webmin")
 echo
 echo -n "---> Start the Webmin Control Panel installation? [y/n][n]:"
@@ -1709,9 +1744,11 @@ echo
 echo
 pause '---> Press [Enter] key to show menu'
 ;;
+
 ###################################################################################
-#                  INSTALLING WAZUH (OSSEC) ELK STACK                             #
+###                         WAZUH + ELK STACK INSTALLATION                      ###
 ###################################################################################
+
 "wazuh")
 WHITETXT "============================================================================="
 echo
@@ -1847,9 +1884,11 @@ pause '---> Press [Enter] key to show menu'
 REDTXT "------> EXIT"
 exit
 ;;
+
 ###################################################################################
-#                               MENU DEFAULT CATCH ALL                            #
+###                             CATCH ALL MENU - THE END                        ###
 ###################################################################################
+
 *)
 printf "\033c"
 ;;
