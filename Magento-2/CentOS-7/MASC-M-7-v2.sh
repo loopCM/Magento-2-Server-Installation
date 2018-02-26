@@ -1465,10 +1465,16 @@ cat > /usr/local/bin/zend_opcache.sh <<END
     EXTENSION="\${FILE##*.}"
   if [[ "\$EXTENSION" =~ \$TARGETEXT ]];
     then
-    su ${MAGE_WEB_USER} -s /bin/bash -c "curl --cookie 'developer_$(openssl rand 2 -hex)' --silent ${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php?page=invalidate&file=\${FILE} >/dev/null 2>&1"
+    su ${MAGE_WEB_USER} -s /bin/bash -c "curl --silent ${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php?page=invalidate&file=\${FILE} >/dev/null 2>&1"
   fi
 done
 END
+echo
+#    DEVELOPER_SECRET="developer_$(openssl rand 4 -hex)"
+#    # Using cache bypass developer cookie and query string
+#    if ( req.http.cookie ~ "${DEVELOPER_SECRET}" || req.url ~ "[\?&]${DEVELOPER_SECRET}") {
+#    return( pass );
+#    }
 echo
 GREENTXT "DISABLE MAGENTO CACHE AND ENABLE DEVELOPER MODE"
 rm -rf var/*
