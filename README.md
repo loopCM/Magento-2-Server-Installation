@@ -9,11 +9,7 @@ SSL CONFIGURATION:
 ![SSL CONFIGURATION](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/demo-ssl-a%2B.png)
 
 GTMETRIX:
-![GTMETRIX](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/gtmetrix.png)
-
-GOOGLE PAGESPEED:
-![GOOGLE PAGESPEED](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/pagespeed-green.jpg.png)
-
+![GTMETRIX](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/screencapture-gtmetrix-reports-demo-magenx-com.png)
 
 ---->> Magento **1.9.3.x**<br/>
 ---->> Magento **2.2.x**
