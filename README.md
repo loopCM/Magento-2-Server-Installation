@@ -3,7 +3,7 @@
 MASC-M<sup>™</sup>
 ======
 
-DEMO: https://demo.magenx.com
+DEMO: https://demo.magenx.com <br/>
 INSTALL: `curl -sL https://magenx.sh > magenx.sh && bash magenx.sh`
 
 SSL CONFIGURATION:
