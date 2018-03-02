@@ -183,6 +183,7 @@ installed_packages="$(rpm -qa --qf '%{name}\n' 'mysqld?|Percona*|maria*|php-?|ng
   echo
   exit 1
     else
+  mkdir -p /root/mascm
   echo "webstack_is_clean" > /root/mascm/.webstack
   fi
 fi
