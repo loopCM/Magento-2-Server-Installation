@@ -4,6 +4,7 @@ MASC-M<sup>™</sup>
 ======
 
 DEMO: https://demo.magenx.com
+INSTALL: `curl -sL https://magenx.sh > magenx.sh && bash magenx.sh`
 
 SSL CONFIGURATION:
 ![SSL CONFIGURATION](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/demo-ssl-a%2B.png)
