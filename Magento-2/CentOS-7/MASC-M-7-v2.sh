@@ -5,8 +5,8 @@
 #        All rights reserved.                                                     #
 #=================================================================================#
 SELF=$(basename $0)
-MASCM_VER="21.0.0"
-MASCM_BASE="https://masc.magenx.com"
+MAGENX_VER="21.0.0"
+MAGENX_BASE="https://magenx.sh"
 
 ###################################################################################
 ###                       DEFINE LINKS AND PACKAGES STARTS                      ###
@@ -34,10 +34,10 @@ PERL_MODULES=(LWP-Protocol-https libwww-perl CPAN Template-Toolkit Time-HiRes Ex
 SPHINX="http://sphinxsearch.com/files/sphinx-2.2.11-1.rhel7.x86_64.rpm"
 
 # Nginx extra configuration
-REPO_MASCM_TMP="https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/tmp/"
+REPO_MAGENX_TMP="https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/tmp/"
 NGINX_VERSION=$(curl -s http://nginx.org/en/download.html | grep -oP '(?<=gz">nginx-).*?(?=</a>)' | head -1)
 NGINX_BASE="https://raw.githubusercontent.com/magenx/Magento-nginx-config/master/"
-NGINX_EXTRA_CONF="assets.conf error_page.conf extra_protect.conf export.conf status.conf setup.conf php_backend.conf maps.conf phpmyadmin.conf maintenance.conf"
+NGINX_EXTRA_CONF="assets.conf error_page.conf extra_protect.conf export.conf pagespeed.conf status.conf setup.conf php_backend.conf maps.conf phpmyadmin.conf maintenance.conf"
 
 # Debug Tools
 MYSQL_TUNER="https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl"
@@ -172,7 +172,7 @@ if [[ ${EUID} -ne 0 ]]; then
 fi
 
 # check if webstack is clean
-if ! grep -q "webstack_is_clean" /root/mascm/.webstack >/dev/null 2>&1 ; then
+if ! grep -q "webstack_is_clean" /root/magenx/.webstack >/dev/null 2>&1 ; then
 installed_packages="$(rpm -qa --qf '%{name}\n' 'mysqld?|Percona*|maria*|php-?|nginx*|*ftp*|varnish*|certbot*|redis*|webmin')"
   if [ ! -z "$installed_packages" ]; then
   REDTXT  "ERROR: WEBSTACK PACKAGES ALREADY INSTALLED"
@@ -183,8 +183,8 @@ installed_packages="$(rpm -qa --qf '%{name}\n' 'mysqld?|Percona*|maria*|php-?|ng
   echo
   exit 1
     else
-  mkdir -p /root/mascm
-  echo "webstack_is_clean" > /root/mascm/.webstack
+  mkdir -p /root/magenx
+  echo "webstack_is_clean" > /root/magenx/.webstack
   fi
 fi
 
@@ -202,11 +202,11 @@ if [[ ${RESULT} == up ]]; then
   echo
   exit 1
 fi
-        MD5_NEW=$(curl -sL ${MASCM_BASE} > MASCM_NEW && md5sum MASCM_NEW | awk '{print $1}')
+        MD5_NEW=$(curl -sL ${MAGENX_BASE} > MAGENX_NEW && md5sum MAGENX_NEW | awk '{print $1}')
         MD5_OLD=$(md5sum ${SELF} | awk '{print $1}')
             if [[ "${MD5_NEW}" == "${MD5_OLD}" ]]; then
             GREENTXT "PASS: INTEGRITY CHECK FOR '${SELF}' OK"
-            rm MASCM_NEW
+            rm MAGENX_NEW
             elif [[ "${MD5_NEW}" != "${MD5_OLD}" ]]; then
             echo
             YELLOWTXT "INTEGRITY CHECK FOR '${SELF}'"
@@ -217,14 +217,14 @@ fi
                 echo -n "---> Would you like to update the file now?  [y/n][y]:"
 		read update_agree
 		if [ "${update_agree}" == "y" ];then
-		mv MASCM_NEW ${SELF}
+		mv MAGENX_NEW ${SELF}
 		echo
                 GREENTXT "THE FILE HAS BEEN UPGRADED, PLEASE RUN IT AGAIN"
 		echo
                 exit 1
             else
         echo
-        YELLOWTXT "NEW FILE SAVED TO MASCM_NEW"
+        YELLOWTXT "NEW FILE SAVED TO MAGENX_NEW"
         echo
   fi
 fi
@@ -277,7 +277,7 @@ if [[ ! "${SELINUX}" =~ (disabled|permissive) ]]; then
 fi
 fi
 echo
-if ! grep -q "yes" /root/mascm/.systest >/dev/null 2>&1 ; then
+if ! grep -q "yes" /root/magenx/.systest >/dev/null 2>&1 ; then
 echo "-------------------------------------------------------------------------------------"
 BLUEBG "| QUICK SYSTEM TEST |"
 echo "-------------------------------------------------------------------------------------"
@@ -337,14 +337,14 @@ echo
   WHITETXT "CPU Time: ${CPU_COLOR}"
 
 echo
-mkdir -p /root/mascm/ && echo "yes" > /root/mascm/.systest
+mkdir -p /root/magenx/ && echo "yes" > /root/magenx/.systest
 echo
 pause "---> Press [Enter] key to proceed"
 echo
 fi
 echo
 # ssh test
-if ! grep -q "yes" /root/mascm/.sshport >/dev/null 2>&1 ; then
+if ! grep -q "yes" /root/magenx/.sshport >/dev/null 2>&1 ; then
 if grep -q "Port 22" /etc/ssh/sshd_config >/dev/null 2>&1 ; then
 REDTXT "DEFAULT SSH PORT :22 DETECTED"
 echo
@@ -379,7 +379,7 @@ read new_ssh_test
 if [ "${new_ssh_test}" == "y" ];then
       echo
         GREENTXT "REMEMBER THE NEW SSH PORT NOW: ${NEW_SSH_PORT}"
-        echo "yes" > /root/mascm/.sshport
+        echo "yes" > /root/magenx/.sshport
         else
 	echo
         mv /etc/ssh/sshd_config.BACK /etc/ssh/sshd_config
@@ -400,7 +400,7 @@ echo
 ###################################################################################
 
 echo
-if ! grep -q "yes" /root/mascm/.terms >/dev/null 2>&1 ; then
+if ! grep -q "yes" /root/magenx/.terms >/dev/null 2>&1 ; then
   YELLOWTXT "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
   echo
   YELLOWTXT "BY INSTALLING THIS SOFTWARE AND BY USING ANY AND ALL SOFTWARE"
@@ -415,7 +415,7 @@ if ! grep -q "yes" /root/mascm/.terms >/dev/null 2>&1 ; then
     echo -n "---> Do you agree to these terms?  [y/n][y]:"
     read terms_agree
   if [ "${terms_agree}" == "y" ];then
-    echo "yes" > /root/mascm/.terms
+    echo "yes" > /root/magenx/.terms
           else
         REDTXT "Going out. EXIT"
         echo
@@ -431,7 +431,7 @@ showMenu () {
 printf "\033c"
     echo
       echo
-        echo -e "${DGREYBG}${BOLD}  MAGENTO SERVER CONFIGURATION v.${MASCM_VER}  ${RESET}"
+        echo -e "${DGREYBG}${BOLD}  MAGENTO SERVER CONFIGURATION v.${MAGENX_VER}  ${RESET}"
         BLUETXT ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
         echo
         WHITETXT "-> Install repository and LEMP packages :  ${YELLOW}\tlemp"
@@ -465,7 +465,7 @@ echo
 ###                                  SYSTEM UPGRADE                             ###
 ###################################################################################
 
-if ! grep -q "yes" /root/mascm/.sysupdate >/dev/null 2>&1 ; then
+if ! grep -q "yes" /root/magenx/.sysupdate >/dev/null 2>&1 ; then
 ## install all extra packages
 GREENTXT "SYSTEM PACKAGES INSTALLATION. PLEASE WAIT"
 yum -q -y upgrade >/dev/null 2>&1
@@ -476,7 +476,7 @@ yum install -y yum-utils >/dev/null 2>&1
 yum-config-manager --enable city-fan.org >/dev/null 2>&1
 yum -q -y install ${EXTRA_PACKAGES} ${PERL_MODULES[@]/#/perl-} >/dev/null 2>&1
 echo
-echo "yes" > /root/mascm/.sysupdate
+echo "yes" > /root/magenx/.sysupdate
 echo
 fi
 echo
@@ -785,8 +785,8 @@ echo
       if [ "$?" = 0 ]
         then
           echo
-	    wget -qO /etc/systemd/system/varnish.service ${REPO_MASCM_TMP}varnish.service
-            wget -qO /etc/varnish/varnish.params ${REPO_MASCM_TMP}varnish.params
+	    wget -qO /etc/systemd/system/varnish.service ${REPO_MAGENX_TMP}varnish.service
+            wget -qO /etc/varnish/varnish.params ${REPO_MAGENX_TMP}varnish.params
             systemctl daemon-reload >/dev/null 2>&1
             GREENTXT "VARNISH 52 HAS BEEN INSTALLED  -  OK"
                else
@@ -954,11 +954,11 @@ echo
 WHITETXT "============================================================================="
 GREENTXT "      == MAGENTO DOWNLOADED AND READY FOR INSTALLATION =="
 WHITETXT "============================================================================="
-mkdir -p /root/mascm/
-if [ -f /root/mascm/.mascm_index ]; then
-sed -i "s,webshop.*,webshop ${MAGE_DOMAIN}    ${MAGE_WEB_ROOT_PATH}    ${MAGE_WEB_USER}   ${MAGE_WEB_USER_PASS}  ${MAGE_VERSION}  ${MAGE_VERSION_FULL}," /root/mascm/.mascm_index
+mkdir -p /root/magenx/
+if [ -f /root/magenx/.magenx_index ]; then
+sed -i "s,webshop.*,webshop ${MAGE_DOMAIN}    ${MAGE_WEB_ROOT_PATH}    ${MAGE_WEB_USER}   ${MAGE_WEB_USER_PASS}  ${MAGE_VERSION}  ${MAGE_VERSION_FULL}," /root/magenx/.magenx_index
 else
-cat >> /root/mascm/.mascm_index <<END
+cat >> /root/magenx/.magenx_index <<END
 webshop ${MAGE_DOMAIN}    ${MAGE_WEB_ROOT_PATH}    ${MAGE_WEB_USER}   ${MAGE_WEB_USER_PASS}  ${MAGE_VERSION}  ${MAGE_VERSION_FULL}
 END
 fi
@@ -1002,7 +1002,7 @@ user=root
 password="${MYSQL_ROOT_PASS}"
 END
 fi
-MAGE_VERSION=$(awk '/webshop/ { print $6 }' /root/mascm/.mascm_index)
+MAGE_VERSION=$(awk '/webshop/ { print $6 }' /root/magenx/.magenx_index)
 MAGE_DB_PASS_GEN=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_{}()<>-' | fold -w 15 | head -n 1)
 MAGE_DB_PASS="${MAGE_DB_PASS_GEN}${RANDOM}#"
 echo
@@ -1020,8 +1020,8 @@ GRANT ALL PRIVILEGES ON \`${MAGE_DB_NAME%_*}_%\`.* TO '${MAGE_DB_USER_NAME}'@'${
 exit
 EOMYSQL
 echo
-mkdir -p /root/mascm/
-cat >> /root/mascm/.mascm_index <<END
+mkdir -p /root/magenx/
+cat >> /root/magenx/.magenx_index <<END
 database   ${MAGE_DB_HOST}   ${MAGE_DB_NAME}   ${MAGE_DB_USER_NAME}   ${MAGE_DB_PASS}  ${MYSQL_ROOT_PASS}
 END
 echo
@@ -1036,19 +1036,19 @@ printf "\033c"
 
 "install")
 printf "\033c"
-MAGE_VERSION=$(awk '/webshop/ { print $6 }' /root/mascm/.mascm_index)
-MAGE_VERSION_FULL=$(awk '/webshop/ { print $7 }' /root/mascm/.mascm_index)
+MAGE_VERSION=$(awk '/webshop/ { print $6 }' /root/magenx/.magenx_index)
+MAGE_VERSION_FULL=$(awk '/webshop/ { print $7 }' /root/magenx/.magenx_index)
 echo "-------------------------------------------------------------------------------------"
 BLUEBG   "|  MAGENTO ${MAGE_VERSION} (${MAGE_VERSION_FULL}) INSTALLATION  |"
 echo "-------------------------------------------------------------------------------------"
 echo
-MAGE_WEB_ROOT_PATH=$(awk '/webshop/ { print $3 }' /root/mascm/.mascm_index)
-MAGE_WEB_USER=$(awk '/webshop/ { print $4 }' /root/mascm/.mascm_index)
-MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/mascm/.mascm_index)
-DB_HOST=$(awk '/database/ { print $2 }' /root/mascm/.mascm_index)
-DB_NAME=$(awk '/database/ { print $3 }' /root/mascm/.mascm_index)
-DB_USER_NAME=$(awk '/database/ { print $4 }' /root/mascm/.mascm_index)
-DB_PASS=$(awk '/database/ { print $5 }' /root/mascm/.mascm_index)
+MAGE_WEB_ROOT_PATH=$(awk '/webshop/ { print $3 }' /root/magenx/.magenx_index)
+MAGE_WEB_USER=$(awk '/webshop/ { print $4 }' /root/magenx/.magenx_index)
+MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/magenx/.magenx_index)
+DB_HOST=$(awk '/database/ { print $2 }' /root/magenx/.magenx_index)
+DB_NAME=$(awk '/database/ { print $3 }' /root/magenx/.magenx_index)
+DB_USER_NAME=$(awk '/database/ { print $4 }' /root/magenx/.magenx_index)
+DB_PASS=$(awk '/database/ { print $5 }' /root/magenx/.magenx_index)
 
 cd ${MAGE_WEB_ROOT_PATH}
 chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH}
@@ -1108,7 +1108,7 @@ echo
     echo
     WHITETXT "============================================================================="
 echo
-cat >> /root/mascm/.mascm_index <<END
+cat >> /root/magenx/.magenx_index <<END
 mageadmin  ${MAGE_ADMIN_LOGIN}  ${MAGE_ADMIN_PASS}  ${MAGE_ADMIN_EMAIL}  ${MAGE_TIMEZONE}  ${MAGE_LOCALE} ${MAGE_ADMIN_PATH_RANDOM}
 END
 
@@ -1122,23 +1122,23 @@ printf "\033c"
 
 "config")
 printf "\033c"
-MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/mascm/.mascm_index)
-MAGE_WEB_ROOT_PATH=$(awk '/webshop/ { print $3 }' /root/mascm/.mascm_index)
-MAGE_WEB_USER=$(awk '/webshop/ { print $4 }' /root/mascm/.mascm_index)
-MAGE_WEB_USER_PASS=$(awk '/webshop/ { print $5 }' /root/mascm/.mascm_index)
-MAGE_ADMIN_EMAIL=$(awk '/mageadmin/ { print $4 }' /root/mascm/.mascm_index)
-MAGE_TIMEZONE=$(awk '/mageadmin/ { print $5 }' /root/mascm/.mascm_index)
-MAGE_LOCALE=$(awk '/mageadmin/ { print $6 }' /root/mascm/.mascm_index)
-MAGE_ADMIN_LOGIN=$(awk '/mageadmin/ { print $2 }' /root/mascm/.mascm_index)
-MAGE_ADMIN_PASS=$(awk '/mageadmin/ { print $3 }' /root/mascm/.mascm_index)
-MAGE_ADMIN_PATH_RANDOM=$(awk '/mageadmin/ { print $7 }' /root/mascm/.mascm_index)
-MAGE_VERSION=$(awk '/webshop/ { print $6 }' /root/mascm/.mascm_index)
-MAGE_VERSION_FULL=$(awk '/webshop/ { print $7 }' /root/mascm/.mascm_index)
-MAGE_DB_HOST=$(awk '/database/ { print $2 }' /root/mascm/.mascm_index)
-MAGE_DB_NAME=$(awk '/database/ { print $3 }' /root/mascm/.mascm_index)
-MAGE_DB_USER_NAME=$(awk '/database/ { print $4 }' /root/mascm/.mascm_index)
-MAGE_DB_PASS=$(awk '/database/ { print $5 }' /root/mascm/.mascm_index)
-MYSQL_ROOT_PASS=$(awk '/database/ { print $6 }' /root/mascm/.mascm_index)
+MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/magenx/.magenx_index)
+MAGE_WEB_ROOT_PATH=$(awk '/webshop/ { print $3 }' /root/magenx/.magenx_index)
+MAGE_WEB_USER=$(awk '/webshop/ { print $4 }' /root/magenx/.magenx_index)
+MAGE_WEB_USER_PASS=$(awk '/webshop/ { print $5 }' /root/magenx/.magenx_index)
+MAGE_ADMIN_EMAIL=$(awk '/mageadmin/ { print $4 }' /root/magenx/.magenx_index)
+MAGE_TIMEZONE=$(awk '/mageadmin/ { print $5 }' /root/magenx/.magenx_index)
+MAGE_LOCALE=$(awk '/mageadmin/ { print $6 }' /root/magenx/.magenx_index)
+MAGE_ADMIN_LOGIN=$(awk '/mageadmin/ { print $2 }' /root/magenx/.magenx_index)
+MAGE_ADMIN_PASS=$(awk '/mageadmin/ { print $3 }' /root/magenx/.magenx_index)
+MAGE_ADMIN_PATH_RANDOM=$(awk '/mageadmin/ { print $7 }' /root/magenx/.magenx_index)
+MAGE_VERSION=$(awk '/webshop/ { print $6 }' /root/magenx/.magenx_index)
+MAGE_VERSION_FULL=$(awk '/webshop/ { print $7 }' /root/magenx/.magenx_index)
+MAGE_DB_HOST=$(awk '/database/ { print $2 }' /root/magenx/.magenx_index)
+MAGE_DB_NAME=$(awk '/database/ { print $3 }' /root/magenx/.magenx_index)
+MAGE_DB_USER_NAME=$(awk '/database/ { print $4 }' /root/magenx/.magenx_index)
+MAGE_DB_PASS=$(awk '/database/ { print $5 }' /root/magenx/.magenx_index)
+MYSQL_ROOT_PASS=$(awk '/database/ { print $6 }' /root/magenx/.magenx_index)
 echo "-------------------------------------------------------------------------------------"
 BLUEBG "| POST-INSTALLATION CONFIGURATION |"
 echo "-------------------------------------------------------------------------------------"
@@ -1208,12 +1208,12 @@ GREENTXT "PHPMYADMIN INSTALLATION AND CONFIGURATION"
 	 	   
      htpasswd -b -c /etc/nginx/.mysql mysql ${PMA_PASSWD}  >/dev/null 2>&1
      echo
-cat >> /root/mascm/.mascm_index <<END
+cat >> /root/magenx/.magenx_index <<END
 pma   mysql_${PMA_FOLDER}   mysql   ${PMA_PASSWD}
 END
 echo
 GREENTXT "PROFTPD CONFIGURATION"
-     wget -qO /etc/proftpd.conf ${REPO_MASCM_TMP}proftpd.conf
+     wget -qO /etc/proftpd.conf ${REPO_MAGENX_TMP}proftpd.conf
      ## change proftpd config
      SERVER_IP_ADDR=$(ip route get 1 | awk '{print $NF;exit}')
      USER_IP=${SSH_CLIENT%% *}
@@ -1234,7 +1234,7 @@ GREENTXT "PROFTPD CONFIGURATION"
      systemctl enable proftpd.service >/dev/null 2>&1
      systemctl restart proftpd.service
      echo
-cat >> /root/mascm/.mascm_index <<END
+cat >> /root/magenx/.magenx_index <<END
 proftpd   ${USER_GEOIP}   ${FTP_PORT}   ${MAGE_WEB_USER_PASS}
 END
 echo
@@ -1248,8 +1248,8 @@ fi
 echo
 GREENTXT "OPCACHE GUI, n98-MAGERUN, IMAGE OPTIMIZER, MYSQLTUNER, SSL DEBUG TOOLS"
      mkdir -p /opt/magento_saved_scripts
-     wget -qO /opt/magento_saved_scripts/tlstest_$(openssl rand 2 -hex).php ${REPO_MASCM_TMP}tlstest.php
-     wget -qO /usr/local/bin/wesley.pl ${REPO_MASCM_TMP}wesley.pl
+     wget -qO /opt/magento_saved_scripts/tlstest_$(openssl rand 2 -hex).php ${REPO_MAGENX_TMP}tlstest.php
+     wget -qO /usr/local/bin/wesley.pl ${REPO_MAGENX_TMP}wesley.pl
      wget -qO /usr/local/bin/mysqltuner ${MYSQL_TUNER}
 echo
 GREENTXT "SYSTEM AUTO UPDATE WITH YUM-CRON"
@@ -1300,8 +1300,8 @@ compress
 END
 echo
 GREENTXT "SERVICE STATUS WITH E-MAIL ALERTING"
-wget -qO /etc/systemd/system/service-status-mail@.service ${REPO_MASCM_TMP}service-status-mail@.service
-wget -qO /usr/local/bin/service-status-mail.sh ${REPO_MASCM_TMP}service-status-mail.sh
+wget -qO /etc/systemd/system/service-status-mail@.service ${REPO_MAGENX_TMP}service-status-mail@.service
+wget -qO /usr/local/bin/service-status-mail.sh ${REPO_MAGENX_TMP}service-status-mail.sh
 sed -i "s/MAGEADMINEMAIL/${MAGE_ADMIN_EMAIL}/" /usr/local/bin/service-status-mail.sh
 sed -i "s/DOMAINNAME/${MAGE_DOMAIN}/" /usr/local/bin/service-status-mail.sh
 chmod u+x /usr/local/bin/service-status-mail.sh
@@ -1592,8 +1592,8 @@ pause '---> Press [Enter] key to show menu'
 "firewall")
 WHITETXT "============================================================================="
 echo
-MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/mascm/.mascm_index)
-MAGE_ADMIN_EMAIL=$(awk '/mageadmin/ { print $4 }' /root/mascm/.mascm_index)
+MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/magenx/.magenx_index)
+MAGE_ADMIN_EMAIL=$(awk '/mageadmin/ { print $4 }' /root/magenx/.magenx_index)
 YELLOWTXT "If you are going to use services like CloudFlare - install Fail2Ban"
 echo
 read -e -p "---> Would you like to install CSF firewall(csf) or Fail2Ban(f2b) or cancel (n): " -i "csf"  firewall_test
@@ -1848,7 +1848,7 @@ echo
 GREENTXT "OSSEC WAZUH API SETTINGS"
 sed -i 's/.*config.host.*/config.host = "127.0.0.1";/' /var/ossec/api/configuration/config.js
 echo
-MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/mascm/.mascm_index)
+MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/magenx/.magenx_index)
 KIBANA_PORT=$(shuf -i 10322-10539 -n 1)
 USER_IP=${SSH_CLIENT%% *}
 KIBANA_PASSWD=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 6 | head -n 1)
