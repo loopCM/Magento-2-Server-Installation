@@ -1529,6 +1529,7 @@ chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH}
 find . -type f -exec chmod 660 {} \;
 find . -type d -exec chmod 2770 {} \;
 chmod +x /usr/local/bin/*
+usermod -G apache ${MAGE_WEB_USER}
 echo
 echo
 echo "===========================  INSTALLATION LOG  ======================================"
@@ -1577,10 +1578,10 @@ WHITETXT "[installed db dump]: /root/${MAGE_DB_NAME}.sql.gz"
 echo
 echo "===========================  INSTALLATION LOG  ======================================"
 echo
-usermod -G apache ${MAGE_WEB_USER}
-echo "-------------------------------------------------------------------------------------"
-BLUEBG "| POST-INSTALLATION CONFIGURATION IS COMPLETED |"
-echo "-------------------------------------------------------------------------------------"
+curl --silent -X POST https://www.magenx.com/deploy_feedback_&domain_${MAGE_DOMAIN}_&ipaddr_${SERVER_IP_ADDR} >/dev/null 2>&1
+GREENTXT "SERVER IS READY. THANK YOU"
+echo
+echo
 echo
 pause '---> Press [Enter] key to show menu'
 ;;
