@@ -1578,7 +1578,7 @@ WHITETXT "[installed db dump]: /root/${MAGE_DB_NAME}.sql.gz"
 echo
 echo "===========================  INSTALLATION LOG  ======================================"
 echo
-curl --silent -X POST https://www.magenx.com/deploy_feedback_&domain_${MAGE_DOMAIN}_&ipaddr_${SERVER_IP_ADDR} >/dev/null 2>&1
+curl --silent -X POST https://www.magenx.com/deploy_feedback_domain_${MAGE_DOMAIN}_ipaddr_${SERVER_IP_ADDR} >/dev/null 2>&1
 GREENTXT "SERVER IS READY. THANK YOU"
 echo
 echo
