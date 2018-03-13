@@ -1,5 +1,10 @@
 # Change Log
 
+### RELEASE-21.0.1
+  
+  * fixed request format in /usr/local/bin/zend_opcache.sh
+  * at #L1468
+
 ### RELEASE-21.0.0
   
   * magento 2 only
