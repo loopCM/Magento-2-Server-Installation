@@ -3,7 +3,7 @@
 ### RELEASE-21.0.1
   
   * fixed request format in /usr/local/bin/zend_opcache.sh
-  * at #L1468
+  * at [#L1468](https://github.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/blob/master/Magento-2/CentOS-7/MASC-M-7-v2.sh#L1468)
 
 ### RELEASE-21.0.0
   
