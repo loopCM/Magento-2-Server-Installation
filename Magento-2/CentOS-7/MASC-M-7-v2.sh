@@ -1597,9 +1597,9 @@ MAGE_DOMAIN=$(awk '/webshop/ { print $2 }' /root/magenx/.magenx_index)
 MAGE_ADMIN_EMAIL=$(awk '/mageadmin/ { print $4 }' /root/magenx/.magenx_index)
 YELLOWTXT "If you are going to use services like CloudFlare - install Fail2Ban"
 echo
-read -e -p "---> Would you like to install CSF firewall(csf) or Fail2Ban(f2b) or cancel (n): " -i "csf"  firewall_test
-read firewall_test
-if [ "${firewall_test}" == "csf" ];then
+echo -n "---> Would you like to install CSF firewall(csf) or Fail2Ban(f2b) or cancel (n):"
+read frwlltst
+if [ "${frwlltst}" == "csf" ];then
            echo
                GREENTXT "DOWNLOADING CSF FIREWALL"
                echo
@@ -1659,7 +1659,7 @@ if [ "${firewall_test}" == "csf" ];then
                    sed -i "/|0|/s/^#//g" /etc/csf/csf.blocklists
         csf -r
     fi
-    elif [ "${firewall_test}" == "f2b" ];then
+    elif [ "${frwlltst}" == "f2b" ];then
     echo
     GREENTXT "FAIL2BAN INSTALLATION"
     echo
