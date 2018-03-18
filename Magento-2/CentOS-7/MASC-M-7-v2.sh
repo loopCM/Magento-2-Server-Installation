@@ -1342,7 +1342,6 @@ sed -i "/^Example/d" /etc/freshclam.conf
 sed -i "/^FRESHCLAM_DELAY/d" /etc/sysconfig/freshclam
 echo
 GREENTXT "GOACCESS REALTIME ACCESS LOG DASHBOARD"
-YELLOWTXT "goaccess access.log -o ${MAGE_WEB_ROOT_PATH}/pub/access_report_${RANDOM}.html --real-time-html"
 cd /usr/local/src
 git clone https://github.com/allinurl/goaccess.git
 cd goaccess
@@ -1353,6 +1352,8 @@ make install > goaccess-make-log-file 2>&1
 sed -i '13s/#//' /usr/local/etc/goaccess.conf >/dev/null 2>&1
 sed -i '36s/#//' /usr/local/etc/goaccess.conf >/dev/null 2>&1
 sed -i '70s/#//' /usr/local/etc/goaccess.conf >/dev/null 2>&1
+sed -i "s,#ssl-cert.*,ssl-cert /etc/letsencrypt/live/${MAGE_DOMAIN}/fullchain.pem," /usr/local/etc/goaccess.conf >/dev/null 2>&1
+sed -i "s,#ssl-key.*,ssl-key /etc/letsencrypt/live/${MAGE_DOMAIN}/privkey.pem," /usr/local/etc/goaccess.conf >/dev/null 2>&1
 echo
 GREENTXT "MAGENTO CRONJOBS"
         echo "#* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento cron:run" >> magecron
@@ -1572,6 +1573,8 @@ WHITETXT "[service alert]: /usr/local/bin/service-status-mail.sh"
 echo
 WHITETXT "[redis on port 6379]: systemctl restart redis@6379"
 WHITETXT "[redis on port 6380]: systemctl restart redis@6380"
+echo
+WHITETXT "[goaccess realtime]: goaccess /var/log/nginx/access.log -o ${MAGE_WEB_ROOT_PATH}/pub/access_report_${RANDOM}.html --real-time-html --daemonize"
 echo
 WHITETXT "[crontab]: in case of migration magento 2 cron disabled. enable it if no migration."
 WHITETXT "[installed db dump]: /root/${MAGE_DB_NAME}.sql.gz"
