@@ -1,6 +1,7 @@
 
 
 MASC-M<sup>™</sup>
+Magento **2.x**
 ======
 
 DEMO: https://demo.magenx.com <br/>
@@ -12,7 +13,6 @@ SSL CONFIGURATION:
 GTMETRIX:
 ![GTMETRIX](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/screencapture-gtmetrix-reports-demo-magenx-com.png)
 
----->> Magento **2.x**
 
 <br/>
 #### MagenX - Automated Server Configuration for Magento
