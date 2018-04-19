@@ -1,6 +1,6 @@
 
 
-MASC-M<sup>™</sup>
+MAGENX 
 Magento **2.x**
 ======
 
