@@ -12,10 +12,7 @@ SSL CONFIGURATION:
 GTMETRIX:
 ![GTMETRIX](https://raw.githubusercontent.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/master/screencapture-gtmetrix-reports-demo-magenx-com.png)
 
----->> Magento **1.9.3.x**<br/>
----->> Magento **2.2.x**
-
-*** during installation select your Magento version: 1 or 2
+---->> Magento **2.x**
 
 <br/>
 #### MagenX - Automated Server Configuration for Magento
@@ -23,8 +20,7 @@ Get a fully pre-configured server with Magento and LEMP stack in just 15 minutes
 
 Magento installation including: <br/>
 - WEBMIN CONTROL PANEL
-- HHVM (not compatible with php 7.+ code)
-- VARNISH
+- VARNISH 5
 - NGINX
 - [PAGESPEED](https://github.com/pagespeed/ngx_pagespeed)
 - PHP 7
@@ -34,14 +30,14 @@ Magento installation including: <br/>
 - [MALWARE REALTIME MONITOR (quarantine)](https://github.com/rfxn/linux-malware-detect)
 - CLAMAV ENGINE
 - [MWSCAN](https://github.com/gwillem/magento-malware-scanner)
-- PERCONA (5.6 5.7)
+- PERCONA (5.7)
 - PERCONA TOOL-KIT
 - [MYSQLTUNER (+ weekly reports to admin email)](https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl)
 - MYTOP
 - PHPMYADMIN
 - MAGERUN
 - CSF FIREWALL
-- [OSSEC + ELK STACK 5.3 (JAVA,LOGSTASH,KIBANA,ELASTICSEARCH)](http://www.wazuh.com/)
+- [OSSEC + ELK STACK (JAVA,LOGSTASH,KIBANA,ELASTICSEARCH)](http://www.wazuh.com/)
   + [Packetbeat](https://www.elastic.co/products/beats/packetbeat)
   + [NODE.JS](https://nodejs.org/en/)
 
