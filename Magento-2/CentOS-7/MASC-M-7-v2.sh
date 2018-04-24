@@ -1008,15 +1008,15 @@ MAGE_DB_PASS="${MAGE_DB_PASS_GEN}${RANDOM}#"
 echo
 echo
 read -e -p "---> Enter Magento database host : " -i "localhost" MAGE_DB_HOST
-read -e -p "---> Enter Magento database name : " -i "m${MAGE_VERSION}d_$(openssl rand 2 -hex)_master" MAGE_DB_NAME
-read -e -p "---> Enter Magento database user : " -i "m${MAGE_VERSION}u_$(openssl rand 2 -hex)_user" MAGE_DB_USER_NAME
+read -e -p "---> Enter Magento database name : " -i "m${MAGE_VERSION}d_$(openssl rand 6 -hex)" MAGE_DB_NAME
+read -e -p "---> Enter Magento database user : " -i "m${MAGE_VERSION}u_$(openssl rand 6 -hex)" MAGE_DB_USER_NAME
 echo
 echo
 pause '------> Press [Enter] key to create MySQL database and user'
 mysql <<EOMYSQL
 CREATE USER '${MAGE_DB_USER_NAME}'@'${MAGE_DB_HOST}' IDENTIFIED BY '${MAGE_DB_PASS}';
 CREATE DATABASE ${MAGE_DB_NAME};
-GRANT ALL PRIVILEGES ON \`${MAGE_DB_NAME%_*}_%\`.* TO '${MAGE_DB_USER_NAME}'@'${MAGE_DB_HOST}' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON \`${MAGE_DB_NAME}\`.* TO '${MAGE_DB_USER_NAME}'@'${MAGE_DB_HOST}' WITH GRANT OPTION;
 exit
 EOMYSQL
 echo
