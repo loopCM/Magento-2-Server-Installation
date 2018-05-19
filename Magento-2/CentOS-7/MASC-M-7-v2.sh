@@ -5,7 +5,7 @@
 #        All rights reserved.                                                     #
 #=================================================================================#
 SELF=$(basename $0)
-MAGENX_VER="21.0.1"
+MAGENX_VER="21.0.2"
 MAGENX_BASE="https://magenx.sh"
 
 ###################################################################################
@@ -27,7 +27,7 @@ REPO_REMI="http://rpms.famillecollet.com/enterprise/remi-release-7.rpm"
 REPO_FAN="http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-2-1.rhel7.noarch.rpm"
 
 # WebStack Packages
-EXTRA_PACKAGES="autoconf automake dejavu-fonts-common dejavu-sans-fonts libtidy libpcap pygpgme gettext-devel cppunit recode boost boost-build boost-jam double-conversion fastlz fribidi gflags glog oniguruma tbb ed lz4 libyaml libdwarf bind-utils e2fsprogs svn screen gcc iptraf inotify-tools smartmontools net-tools mcrypt mlocate unzip vim wget curl sudo bc mailx clamav-filesystem clamav-server clamav-update clamav-milter-systemd clamav-data clamav-server-systemd clamav-scanner-systemd clamav clamav-milter clamav-lib clamav-scanner proftpd logrotate git patch ipset strace rsyslog gifsicle ncurses-devel GeoIP GeoIP-devel GeoIP-update openssl-devel ImageMagick libjpeg-turbo-utils pngcrush lsof net-snmp net-snmp-utils xinetd python-pip python-devel ncftp postfix certbot yum-cron yum-plugin-versionlock sysstat libuuid-devel uuid-devel attr iotop expect postgresql-libs unixODBC gcc-c++"
+EXTRA_PACKAGES="autoconf automake dejavu-fonts-common dejavu-sans-fonts libtidy libpcap pygpgme gettext-devel cppunit recode boost boost-build boost-jam double-conversion fastlz fribidi gflags glog oniguruma tbb ed lz4 libyaml libdwarf bind-utils e2fsprogs svn screen gcc iptraf inotify-tools smartmontools net-tools mcrypt mlocate unzip vim wget curl sudo bc mailx clamav-filesystem clamav-server clamav-update clamav-milter-systemd clamav-data clamav-server-systemd clamav-scanner-systemd clamav clamav-milter clamav-lib clamav-scanner proftpd logrotate git patch ipset strace rsyslog gifsicle ncurses-devel GeoIP GeoIP-devel GeoIP-update openssl-devel ImageMagick libjpeg-turbo-utils pngcrush lsof net-snmp net-snmp-utils xinetd python-pip python-devel ncftp postfix yum-cron yum-plugin-versionlock sysstat libuuid-devel uuid-devel attr iotop expect postgresql-libs unixODBC gcc-c++"
 PHP_PACKAGES=(cli common fpm opcache gd curl mbstring bcmath soap mcrypt mysqlnd pdo xml xmlrpc intl gmp php-gettext phpseclib recode symfony-class-loader symfony-common tcpdf tcpdf-dejavu-sans-fonts tidy udan11-sql-parser snappy lz4) 
 PHP_PECL_PACKAGES=(pecl-redis pecl-lzf pecl-geoip pecl-zip pecl-memcache pecl-oauth)
 PERL_MODULES=(LWP-Protocol-https libwww-perl CPAN Template-Toolkit Time-HiRes ExtUtils-CBuilder ExtUtils-Embed ExtUtils-MakeMaker TermReadKey DBI DBD-MySQL Digest-HMAC Digest-SHA1 Test-Simple Moose Net-SSLeay devel)
@@ -1262,21 +1262,12 @@ systemctl enable yum-cron >/dev/null 2>&1
 systemctl restart yum-cron >/dev/null 2>&1
 echo
 GREENTXT "LETSENCRYPT SSL CERTIFICATE REQUEST"
-DNS_A_RECORD=$(getent hosts ${MAGE_DOMAIN} | awk '{ print $1 }')
-SERVER_IP_ADDR=$(ip route get 1 | awk '{print $NF;exit}')
-if [ "${DNS_A_RECORD}" != "${SERVER_IP_ADDR}" ] ; then
-    echo
-    REDTXT "DNS A record and your servers IP address do not match"
-	YELLOWTXT "Your servers ip address ${SERVER_IP_ADDR}"
-	YELLOWTXT "Domain ${MAGE_DOMAIN} resolves to ${DNS_A_RECORD}"
-	YELLOWTXT "Please change your DNS A record to this servers IP address, and run this command later: "
-	WHITETXT "/usr/bin/certbot certonly --agree-tos --no-eff-email --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}/pub/ -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}"
-	echo  
-    else
-    /usr/bin/certbot certonly --agree-tos --no-eff-email --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}/pub/ -d ${MAGE_DOMAIN} -d www.${MAGE_DOMAIN}
-    systemctl reload nginx
- fi
-echo '45 5 * * 1 root /usr/bin/certbot renew --quiet --renew-hook "systemctl reload nginx" >> /var/log/letsencrypt-renew.log' >> /etc/crontab
+wget -q https://dl.eff.org/certbot-auto -O /usr/local/bin/certbot-auto
+chmod +x /usr/local/bin/certbot-auto
+certbot-auto --install-only
+certbot-auto certonly --agree-tos --no-eff-email --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}/pub/
+systemctl reload nginx
+echo '45 5 * * 1 root certbot-auto renew --quiet --deploy-hook "systemctl reload nginx" >> /var/log/letsencrypt-renew.log' >> /etc/crontab
 echo
 GREENTXT "GENERATE DHPARAM FOR NGINX SSL"
 openssl dhparam -dsaparam -out /etc/ssl/certs/dhparams.pem 4096
