@@ -1,5 +1,10 @@
 # Change Log
 
+### RELEASE-21.0.2
+  
+  * replaced certbot/letsencrypt packages, using certbot-auto configuration script.
+  * at [history commit diff](https://github.com/magenx/Magento-Automated-Server-Configuration-from-MagenX/commit/775397467b193242ca9846d8d8f337119703ded9#diff-3338fed2bb010f9dfb389aae8c5d556c)
+
 ### RELEASE-21.0.1
   
   * fixed request format in /usr/local/bin/zend_opcache.sh
