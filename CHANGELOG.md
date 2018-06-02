@@ -1,5 +1,9 @@
 # Change Log
 
+### RELEASE-21.0.3
+  
+  * mysqlrouter - remote mysql connection routing
+
 ### RELEASE-21.0.2
   
   * replaced certbot/letsencrypt packages, using certbot-auto configuration script.
