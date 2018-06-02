@@ -5,7 +5,7 @@
 #        All rights reserved.                                                     #
 #=================================================================================#
 SELF=$(basename $0)
-MAGENX_VER="21.0.2"
+MAGENX_VER="21.0.3"
 MAGENX_BASE="https://magenx.sh"
 
 ###################################################################################
@@ -23,6 +23,7 @@ WEBMIN_FAIL2BAN="http://download.webmin.com/download/modules/fail2ban.wbm.gz"
 
 # Repositories
 REPO_PERCONA="https://www.percona.com/redir/downloads/percona-release/redhat/percona-release-0.1-4.noarch.rpm"
+REPO_MYSQL="https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm"
 REPO_REMI="http://rpms.famillecollet.com/enterprise/remi-release-7.rpm"
 REPO_FAN="http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-2-1.rhel7.noarch.rpm"
 
@@ -539,11 +540,15 @@ if [ "${repo_percona_install}" == "y" ];then
                 echo
               echo
               ## get mysql tools
+	      YELLOWTXT "INSTALL MYSQLTOP, PERCONA-TOOLKIT, MYSQLROUTER"
               cd /usr/local/src
               wget -qO - ${MYSQL_TOP} | tar -xzp && cd mytop*
               perl Makefile.PL && make && make install  >/dev/null 2>&1
               yum -y -q install percona-toolkit >/dev/null 2>&1
               echo
+              yum -y -q install ${REPO_MYSQL} >/dev/null 2>&1
+              yum-config-manager --disable mysql80-community >/dev/null 2>&1
+              yum -y -q install mysql-router >/dev/null 2>&1
               else
               echo
               REDTXT "DATABASE INSTALLATION ERROR"
@@ -1237,6 +1242,19 @@ GREENTXT "PROFTPD CONFIGURATION"
 cat >> /root/magenx/.magenx_index <<END
 proftpd   ${USER_GEOIP}   ${FTP_PORT}   ${MAGE_WEB_USER_PASS}
 END
+echo
+if [ -f /etc/mysqlrouter/mysqlrouter.conf ]; then
+GREENTXT "MYSQLROUTER CONFIGURATION"
+ROUTER_PORT=$(shuf -i 10501-10539 -n 1)
+cat >> /etc/mysqlrouter/mysqlrouter.conf <<END
+
+## REMOTE PORT ROUTING
+[routing:${MAGE_WEB_USER}_mysql]
+bind_address = ${SERVER_IP_ADDR}:${ROUTER_PORT}
+destinations = 127.0.0.1:3306
+mode = read-only
+END
+fi
 echo
 if [ -f /etc/systemd/system/varnish.service ]; then
 GREENTXT "VARNISH CACHE SETTINGS"
