@@ -34,6 +34,7 @@ Magento installation including: <br/>
 - PERCONA TOOL-KIT
 - [MYSQLTUNER (+ weekly reports to admin email)](https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl)
 - MYTOP
+- [MYSQLROUTER](https://dev.mysql.com/doc/mysql-router/8.0/en/)
 - PHPMYADMIN
 - MAGERUN
 - CSF FIREWALL
