@@ -1476,7 +1476,7 @@ cat > /usr/local/bin/zend_opcache.sh <<END
   if [[ "\$EXTENSION" =~ \$TARGETEXT ]];
     then
     su ${MAGE_WEB_USER} -s /bin/bash -c "curl --silent '${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php?page=invalidate&file=\${FILE}' >/dev/null 2>&1"
-    echo "\$line " >> ${MAGE_WEB_ROOT_PATH}/var/log/zend_opcache_monitor.log
+    su ${MAGE_WEB_USER} -s /bin/bash -c "echo '\${line} ' >> ${MAGE_WEB_ROOT_PATH}/var/log/zend_opcache_monitor.log"
   fi
 done
 END
@@ -1516,7 +1516,7 @@ cat >> /usr/local/bin/optimages.sh <<END
   if [[ "\${EXTENSION}" =~ \${TARGETEXT} ]];
     then
    su ${MAGE_WEB_USER} -s /bin/bash -c "/usr/local/bin/wesley.pl \${FILE} >/dev/null 2>&1"
-   echo "\${line} " >> ${MAGE_WEB_ROOT_PATH}/var/log/images_optimization.log
+   su ${MAGE_WEB_USER} -s /bin/bash -c "echo '\${line} ' >> ${MAGE_WEB_ROOT_PATH}/var/log/images_optimization.log"
   fi
 done
 END
