@@ -1560,6 +1560,7 @@ WHITETXT "[mysql user]: ${MAGE_DB_USER_NAME}"
 WHITETXT "[mysql pass]: ${MAGE_DB_PASS}"
 WHITETXT "[mysql database]: ${MAGE_DB_NAME}"
 WHITETXT "[mysql root pass]: ${MYSQL_ROOT_PASS}"
+WHITETXT "[mysql-router port]:" ${ROUTER_PORT}
 echo
 WHITETXT "[ftp port]: ${FTP_PORT}"
 WHITETXT "[ftp user]: ${MAGE_WEB_USER}"
