@@ -544,7 +544,7 @@ if [ "${repo_percona_install}" == "y" ];then
               cd /usr/local/src
               wget -qO - ${MYSQL_TOP} | tar -xzp && cd mytop*
               perl Makefile.PL && make && make install  >/dev/null 2>&1
-              yum -y -q install percona-toolkit >/dev/null 2>&1
+              yum -y -q install percona-toolkit xtrabackup >/dev/null 2>&1
               echo
               yum -y -q install ${REPO_MYSQL} >/dev/null 2>&1
               yum-config-manager --disable mysql80-community >/dev/null 2>&1
