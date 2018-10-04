@@ -1458,34 +1458,6 @@ systemctl restart redis@6380
 
 cd ${MAGE_WEB_ROOT_PATH}
 chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH%/*}
-GREENTXT "OPCACHE INVALIDATION MONITOR"
-OPCACHE_FILE=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z' | fold -w 12 | head -n 1)
-wget -qO /opt/magento_saved_scripts/${OPCACHE_FILE}_opcache_gui.php https://raw.githubusercontent.com/magenx/opcache-gui/master/index.php
-cp /opt/magento_saved_scripts/${OPCACHE_FILE}_opcache_gui.php ${MAGE_WEB_ROOT_PATH}/pub/
-echo
-cat > /usr/local/bin/zend_opcache.sh <<END
-#!/bin/bash
-## monitor magento folder and invalidate opcache
-/usr/bin/inotifywait -e modify,move \\
-    -mrq --timefmt %a-%b-%d-%T --format '%w%f %T' \\
-    --excludei '/\.|(\.swp|\.$(find ${MAGE_WEB_ROOT_PATH} -type f -name '*.*' | sed 's|.*\.||' | sort -u | grep -v ph | xargs | sed 's/ /|\\./g'))|\.php~' \\
-    ${MAGE_WEB_ROOT_PATH}/ | while read line; do
-    FILE=\$(echo \${line} | cut -d' ' -f1 | sed -e 's/\/\./\//g' | cut -f1-2 -d'.')
-    TARGETEXT="(php|phtml)"
-    EXTENSION="\${FILE##*.}"
-  if [[ "\$EXTENSION" =~ \$TARGETEXT ]];
-    then
-    su ${MAGE_WEB_USER} -s /bin/bash -c "curl --silent '${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php?page=invalidate&file=\${FILE}' >/dev/null 2>&1"
-    su ${MAGE_WEB_USER} -s /bin/bash -c "echo '\${line} ' >> ${MAGE_WEB_ROOT_PATH}/var/log/zend_opcache_monitor.log"
-  fi
-done
-END
-echo
-#    DEVELOPER_SECRET="developer_$(openssl rand 4 -hex)"
-#    # Using cache bypass developer cookie and query string
-#    if ( req.http.cookie ~ "${DEVELOPER_SECRET}" || req.url ~ "[\?&]${DEVELOPER_SECRET}") {
-#    return( pass );
-#    }
 echo
 GREENTXT "DISABLE MAGENTO CACHE AND ENABLE DEVELOPER MODE"
 rm -rf var/*
@@ -1501,38 +1473,6 @@ GREENTXT "SAVING COMPOSER JSON AND LOCK"
 cp composer.json ../composer.json.saved
 cp composer.lock ../composer.lock.saved
 echo
-GREENTXT "IMAGES OPTIMIZATION SCRIPT"
-echo
-cat >> /usr/local/bin/optimages.sh <<END
-#!/bin/bash
-## monitor media folder and optimize new images
-/usr/bin/inotifywait -e create \\
-    -mrq --timefmt %a-%b-%d-%T --format '%w%f %T' \\
-    --excludei '(\.swp|\.$(find ${MAGE_WEB_ROOT_PATH} -type f -name '*.*' | sed 's|.*\.||' | sort -u |  grep -Eiv 'jpe?g|png' | xargs | sed 's/ /|\\./g'))' \\
-    ${MAGE_WEB_ROOT_PATH}/pub/media | while read line; do
-    FILE=\$(echo \${line} | cut -d' ' -f1)
-    TARGETEXT="(jpg|jpeg|png|JPG)"
-    EXTENSION="\${FILE##*.}"
-  if [[ "\${EXTENSION}" =~ \${TARGETEXT} ]];
-    then
-   su ${MAGE_WEB_USER} -s /bin/bash -c "/usr/local/bin/wesley.pl \${FILE} >/dev/null 2>&1"
-   su ${MAGE_WEB_USER} -s /bin/bash -c "echo '\${line} ' >> ${MAGE_WEB_ROOT_PATH}/var/log/images_optimization.log"
-  fi
-done
-END
-cat >> /usr/local/bin/cron_check.sh <<END
-#!/bin/bash
-## check opcache gui exists
-if [ ! -f "${MAGE_WEB_ROOT_PATH}/pub/${OPCACHE_FILE}_opcache_gui.php" ]; then
-    cp /opt/magento_saved_scripts/${OPCACHE_FILE}_opcache_gui.php ${MAGE_WEB_ROOT_PATH}/pub/${OPCACHE_FILE}_opcache_gui.php
-    chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH}/pub/${OPCACHE_FILE}_opcache_gui.php
-fi
-## check magento cli permissions
-chmod u+x ${MAGE_WEB_ROOT_PATH}/bin/magento
-## check if optimization scripts running
-pgrep optimages.sh > /dev/null || /usr/local/bin/optimages.sh &
-pgrep zend_opcache.sh > /dev/null || /usr/local/bin/zend_opcache.sh &
-END
 echo
 GREENTXT "FIXING PERMISSIONS"
 chown -R ${MAGE_WEB_USER}:${MAGE_WEB_USER} ${MAGE_WEB_ROOT_PATH}
@@ -1573,11 +1513,6 @@ WHITETXT "[database monitor]: /usr/local/bin/mytop"
 WHITETXT "[mysql tuner]: /usr/local/bin/mysqltuner"
 echo
 WHITETXT "[n98-magerun2]: /usr/local/bin/n98-magerun2"
-echo
-WHITETXT "[images optimization]: /usr/local/bin/optimages.sh + /usr/local/bin/wesley.pl"
-WHITETXT "[opcache gui]: ${MAGE_DOMAIN}/${OPCACHE_FILE}_opcache_gui.php"
-WHITETXT "[opcache invalidation]: /usr/local/bin/zend_opcache.sh + ${OPCACHE_FILE}_opcache_gui.php"
-WHITETXT "[cronjob]: /usr/local/bin/cron_check.sh - to keep above files running"
 echo
 WHITETXT "[service alert]: /usr/local/bin/service-status-mail.sh"
 echo
