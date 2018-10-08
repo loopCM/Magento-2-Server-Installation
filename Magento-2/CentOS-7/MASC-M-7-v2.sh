@@ -1283,7 +1283,7 @@ GREENTXT "LETSENCRYPT SSL CERTIFICATE REQUEST"
 wget -q https://dl.eff.org/certbot-auto -O /usr/local/bin/certbot-auto
 chmod +x /usr/local/bin/certbot-auto
 certbot-auto --install-only
-certbot-auto certonly --manual -d *.${MAGE_DOMAIN} -d ${MAGE_DOMAIN} --no-eff-email --email ${MAGE_ADMIN_EMAIL} --agree-tos --manual-public-ip-logging-ok --preferred-challenges dns-01 --server https://acme-v02.api.letsencrypt.org/directory
+certbot-auto certonly --agree-tos --no-eff-email --email ${MAGE_ADMIN_EMAIL} --webroot -w ${MAGE_WEB_ROOT_PATH}/pub/
 systemctl reload nginx
 echo '45 5 * * 1 root certbot-auto renew --quiet --deploy-hook "systemctl reload nginx" >> /var/log/letsencrypt-renew.log' >> /etc/crontab
 echo
