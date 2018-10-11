@@ -1526,6 +1526,9 @@ WHITETXT "[installed db dump]: /root/${MAGE_DB_NAME}.sql.gz"
 echo
 echo "===========================  INSTALLATION LOG  ======================================"
 echo
+## simple installation statistics for 30 days
+curl --silent -X POST https://www.magenx.com/ping_back_domain_${MAGE_DOMAIN}_geo_${USER_GEOIP}_keep_30d >/dev/null 2>&1
+echo
 GREENTXT "SERVER IS READY. THANK YOU"
 echo
 echo
