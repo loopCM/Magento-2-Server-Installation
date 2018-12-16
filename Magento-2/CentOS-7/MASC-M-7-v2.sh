@@ -1730,10 +1730,10 @@ yum -y -q install wazuh-api
 echo
 GREENTXT "INSTALLATION OF JAVA 8 JDK RPM:"
 cd /usr/local/src
-curl -Lo jre-8-linux-x64.rpm --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/jre-8u181-linux-x64.rpm"
-yum -y -q localinstall jre-8u181-linux-x64.rpm
-export JAVA_HOME=/usr/java/jdk1.8.0_181/jre
-echo "export JAVA_HOME=/usr/java/jdk1.8.0_181/jre" > /etc/profile
+curl -Lo jre-8u191-linux-x64.rpm --header "Cookie: oraclelicense=accept-securebackup-cookie" "https://download.oracle.com/otn-pub/java/jdk/8u191-b12/2787e4a523244c269598db4e85c51e0c/jre-8u191-linux-x64.rpm"
+yum -y -q localinstall jre-8u191-linux-x64.rpm
+export JAVA_HOME=/usr/java/jdk1.8.0_191/jre
+echo "export JAVA_HOME=/usr/java/jdk1.8.0_191/jre" > /etc/profile
 echo
 echo
 GREENTXT "INSTALLATION OF ELASTCSEARCH:"
