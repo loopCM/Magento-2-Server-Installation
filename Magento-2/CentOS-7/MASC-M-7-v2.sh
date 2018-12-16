@@ -1731,7 +1731,7 @@ echo
 GREENTXT "INSTALLATION OF JAVA 8 JDK RPM:"
 cd /usr/local/src
 curl -Lo jre-8u191-linux-x64.rpm --header "Cookie: oraclelicense=accept-securebackup-cookie" "https://download.oracle.com/otn-pub/java/jdk/8u191-b12/2787e4a523244c269598db4e85c51e0c/jre-8u191-linux-x64.rpm"
-yum -y -q localinstall jre-8u191-linux-x64.rpm
+yum -y localinstall jre-8u191-linux-x64.rpm
 export JAVA_HOME=/usr/java/jdk1.8.0_191/jre
 echo "export JAVA_HOME=/usr/java/jdk1.8.0_191/jre" > /etc/profile
 echo
