@@ -635,12 +635,12 @@ if [ "${repo_remi_install}" == "y" ];then
           echo
             GREENTXT "REPOSITORY HAS BEEN INSTALLED  -  OK"
             echo
-            GREENTXT "Installation of PHP 7.1:"
+            GREENTXT "Installation of PHP 7.2:"
             echo
             echo -n "     PROCESSING  "
             long_progress &
             pid="$!"
-            yum --enablerepo=remi,remi-php71 -y -q install php ${PHP_PACKAGES[@]/#/php-} ${PHP_PECL_PACKAGES[@]/#/php-} >/dev/null 2>&1
+            yum --enablerepo=remi,remi-php72 -y -q install php ${PHP_PACKAGES[@]/#/php-} ${PHP_PECL_PACKAGES[@]/#/php-} >/dev/null 2>&1
             stop_progress "$pid"
             rpm  --quiet -q php
        if [ "$?" = 0 ]
@@ -1203,7 +1203,7 @@ GREENTXT "PHPMYADMIN INSTALLATION AND CONFIGURATION"
      PMA_FOLDER=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
      PMA_PASSWD=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 6 | head -n 1)
      BLOWFISHCODE=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9=+_[]{}()<>-' | fold -w 64 | head -n 1)
-     yum -y -q --enablerepo=remi,remi-test,remi-php70 install phpMyAdmin
+     yum -y -q --enablerepo=remi,remi-test,remi-php72 install phpMyAdmin
      USER_IP=${SSH_CLIENT%% *} 
      sed -i "s/.*blowfish_secret.*/\$cfg['blowfish_secret'] = '${BLOWFISHCODE}';/" /etc/phpMyAdmin/config.inc.php
      sed -i "s/PHPMYADMIN_PLACEHOLDER/mysql_${PMA_FOLDER}/g" /etc/nginx/conf_m${MAGE_VERSION}/phpmyadmin.conf
@@ -1271,7 +1271,7 @@ GREENTXT "OPCACHE GUI, n98-MAGERUN, IMAGE OPTIMIZER, MYSQLTUNER, SSL DEBUG TOOLS
      wget -qO /usr/local/bin/mysqltuner ${MYSQL_TUNER}
 echo
 GREENTXT "SYSTEM AUTO UPDATE WITH YUM-CRON"
-yum-config-manager --enable remi-php71 >/dev/null 2>&1
+yum-config-manager --enable remi-php72 >/dev/null 2>&1
 yum-config-manager --enable remi >/dev/null 2>&1
 sed -i 's/apply_updates = no/apply_updates = yes/' /etc/yum/yum-cron.conf
 sed -i "s/email_from = root@localhost/email_from = yum-cron@${MAGE_DOMAIN}/" /etc/yum/yum-cron.conf
