@@ -5,7 +5,7 @@
 #        All rights reserved.                                                     #
 #=================================================================================#
 SELF=$(basename $0)
-MAGENX_VER="21.0.3"
+MAGENX_VER="21.0.5"
 MAGENX_BASE="https://magenx.sh"
 
 ###################################################################################
@@ -1764,9 +1764,9 @@ systemctl restart elasticsearch.service
 YELLOWTXT "---> Waiting for elasticsearch to start:"
 while ! curl --output /dev/null --silent --head --fail http://localhost:9200; do sleep 1 && echo -n .; done
 echo "Importing templates"
-curl https://raw.githubusercontent.com/wazuh/wazuh/3.2/extensions/elasticsearch/wazuh-elastic6-template-alerts.json | curl -XPUT 'http://localhost:9200/_template/wazuh' -H 'Content-Type: application/json' -d @-
-curl https://raw.githubusercontent.com/wazuh/wazuh/3.2/extensions/elasticsearch/wazuh-elastic6-template-monitoring.json | curl -XPUT 'http://localhost:9200/_template/wazuh-agent' -H 'Content-Type: application/json' -d @-
-curl https://raw.githubusercontent.com/wazuh/wazuh/3.2/extensions/elasticsearch/alert_sample.json | curl -XPUT "http://localhost:9200/wazuh-alerts-3.x-"`date +%Y.%m.%d`"/wazuh/sample" -H 'Content-Type: application/json' -d @-
+curl https://raw.githubusercontent.com/wazuh/wazuh/3.7/extensions/elasticsearch/wazuh-elastic6-template-alerts.json | curl -X PUT "http://localhost:9200/_template/wazuh" -H 'Content-Type: application/json' -d @-
+curl https://raw.githubusercontent.com/wazuh/wazuh/3.7/extensions/elasticsearch/wazuh-elastic6-template-monitoring.json | curl -XPUT 'http://localhost:9200/_template/wazuh-agent' -H 'Content-Type: application/json' -d @-
+curl https://raw.githubusercontent.com/wazuh/wazuh/3.7/extensions/elasticsearch/alert_sample.json | curl -XPUT "http://localhost:9200/wazuh-alerts-3.x-"`date +%Y.%m.%d`"/wazuh/sample" -H 'Content-Type: application/json' -d @-
 echo
 echo
 GREENTXT "INSTALLATION OF PACKETBEAT:"
@@ -1777,7 +1777,7 @@ echo
 echo
 GREENTXT "INSTALLATION OF LOGSTASH:"
 yum -y -q install logstash
-curl -so /etc/logstash/conf.d/01-wazuh.conf https://raw.githubusercontent.com/wazuh/wazuh/3.2/extensions/logstash/01-wazuh-local.conf
+curl -so /etc/logstash/conf.d/01-wazuh.conf https://raw.githubusercontent.com/wazuh/wazuh/3.7/extensions/logstash/01-wazuh-local.conf
 usermod -a -G ossec logstash
 systemctl daemon-reload
 systemctl enable logstash.service
