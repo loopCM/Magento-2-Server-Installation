@@ -1818,7 +1818,7 @@ server {
 	#ssl_certificate_key /etc/letsencrypt/live/${MAGE_DOMAIN}/privkey.pem;
 	
     auth_basic  "blackhole";
-    auth_basic_user_file .ossec;
+    auth_basic_user_file .wazuh;
        
        location / {
                proxy_pass http://127.0.0.1:5601;
