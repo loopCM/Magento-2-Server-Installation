@@ -1,5 +1,11 @@
 # Change Log
 
+### RELEASE-21.0.5
+  
+  * fixed wazuh/ossec configuration
+  * php 7.2
+  * minor code cleanup
+
 ### RELEASE-21.0.3
   
   * mysqlrouter - remote mysql connection routing
