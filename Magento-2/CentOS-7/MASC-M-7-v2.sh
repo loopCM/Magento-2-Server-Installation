@@ -1786,7 +1786,7 @@ echo
 echo
 GREENTXT "INSTALLATION OF KIBANA:"
 yum -y -q install kibana
-/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp.zip
+/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.2_6.5.4.zip
 echo
 systemctl daemon-reload
 systemctl enable kibana.service
