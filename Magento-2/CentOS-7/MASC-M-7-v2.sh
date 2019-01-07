@@ -618,7 +618,7 @@ fi
 echo
 WHITETXT "============================================================================="
 echo
-echo -n "---> Start the Remi repository and PHP 7.1 installation? [y/n][n]:"
+echo -n "---> Start the Remi repository and PHP 7.2 installation? [y/n][n]:"
 read repo_remi_install
 if [ "${repo_remi_install}" == "y" ];then
           echo
