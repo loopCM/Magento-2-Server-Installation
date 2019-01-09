@@ -1378,76 +1378,26 @@ rm rootcron
 echo
 GREENTXT "REDIS CACHE AND SESSION STORAGE"
 echo
-sed -i -e '/session/{n;N;N;d}' ${MAGE_WEB_ROOT_PATH}/app/etc/env.php
-sed -i "/.*session.*/a \\
-   array ( \\
-   'save' => 'redis', \\
-   'redis' => \\
-      array ( \\
-        'host' => '127.0.0.1', \\
-        'port' => '6379', \\
-        'password' => '', \\
-        'timeout' => '5', \\
-        'persistent_identifier' => 'db1', \\
-        'database' => '1', \\
-        'compression_threshold' => '2048', \\
-        'compression_library' => 'lzf', \\
-        'log_level' => '1', \\
-        'max_concurrency' => '6', \\
-        'break_after_frontend' => '5', \\
-        'break_after_adminhtml' => '30', \\
-        'first_lifetime' => '600', \\
-        'bot_first_lifetime' => '60', \\
-        'bot_lifetime' => '7200', \\
-        'disable_locking' => '0', \\
-        'min_lifetime' => '60', \\
-        'max_lifetime' => '2592000' \\
-    ), \\
-), \\
-'cache' =>  \\
-  array ( \\
-    'frontend' =>  \\
-    array ( \\
-      'default' =>  \\
-      array ( \\
-        'backend' => 'Cm_Cache_Backend_Redis', \\
-        'backend_options' =>  \\
-        array ( \\
-          'server' => '127.0.0.1', \\
-          'port' => '6380', \\
-          'persistent' => '', \\
-          'database' => '1', \\
-          'force_standalone' => '0', \\
-          'connect_retries' => '2', \\
-          'read_timeout' => '10', \\
-          'automatic_cleaning_factor' => '0', \\
-          'compress_data' => '0', \\
-          'compress_tags' => '0', \\
-          'compress_threshold' => '20480', \\
-          'compression_lib' => 'lzf', \\
-        ), \\
-      ), \\
-      'page_cache' =>  \\
-      array ( \\
-        'backend' => 'Cm_Cache_Backend_Redis', \\
-        'backend_options' =>  \\
-        array ( \\
-          'server' => '127.0.0.1', \\
-          'port' => '6380', \\
-          'persistent' => '', \\
-          'database' => '2', \\
-          'force_standalone' => '0', \\
-          'connect_retries' => '2', \\
-          'read_timeout' => '10', \\
-          'automatic_cleaning_factor' => '0', \\
-          'compress_data' => '1', \\
-          'compress_tags' => '1', \\
-          'compress_threshold' => '20480', \\
-          'compression_lib' => 'lzf', \\
-        ), \\
-      ), \\
-    ), \\
-  ), \\ " ${MAGE_WEB_ROOT_PATH}/app/etc/env.php	
+## cache backend
+chmod u+x bin/magento
+su ${MAGE_WEB_USER} -s /bin/bash -c "bin/magento setup:config:set \
+--cache-backend=redis \
+--cache-backend-redis-server=127.0.0.1 \
+--cache-backend-redis-port=6380
+--cache-backend-redis-db=1"
+## page cache
+su ${MAGE_WEB_USER} -s /bin/bash -c "bin/magento setup:config:set \
+--page-cache=redis \
+--page-cache-redis-server=127.0.0.1 \
+--page-cache-redis-port=6380 \
+--page-cache-redis-db=2"
+## session
+su ${MAGE_WEB_USER} -s /bin/bash -c "bin/magento setup:config:set \
+--session-save=redis \
+--session-save-redis-host=127.0.0.1 \
+--session-save-redis-port=6379 \
+--session-save-redis-log-level=3 \
+--session-save-redis-db=1"
 echo
 systemctl daemon-reload
 systemctl restart nginx.service
@@ -1467,7 +1417,6 @@ sed -i "s/report/report|${OPCACHE_FILE}_opcache_gui/" /etc/nginx/sites-available
 systemctl restart php-fpm.service
 echo
 curl -s -o /usr/local/bin/n98-magerun2 https://files.magerun.net/n98-magerun2.phar
-chmod u+x bin/magento
 GREENTXT "SAVING COMPOSER JSON AND LOCK"
 cp composer.json ../composer.json.saved
 cp composer.lock ../composer.lock.saved
