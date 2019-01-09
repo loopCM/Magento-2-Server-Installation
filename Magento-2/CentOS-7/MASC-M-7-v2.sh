@@ -1379,11 +1379,12 @@ echo
 GREENTXT "REDIS CACHE AND SESSION STORAGE"
 echo
 ## cache backend
+cd ${MAGE_WEB_ROOT_PATH}
 chmod u+x bin/magento
 su ${MAGE_WEB_USER} -s /bin/bash -c "bin/magento setup:config:set \
 --cache-backend=redis \
 --cache-backend-redis-server=127.0.0.1 \
---cache-backend-redis-port=6380
+--cache-backend-redis-port=6380 \
 --cache-backend-redis-db=1"
 ## page cache
 su ${MAGE_WEB_USER} -s /bin/bash -c "bin/magento setup:config:set \
