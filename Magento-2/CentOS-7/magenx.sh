@@ -1,11 +1,11 @@
 #!/bin/bash
 #=================================================================================#
 #        Automated Server Configuration for Magento 2                             #
-#        Copyright (C) 2018 admin@magenx.com                                      #
+#        Copyright (C) 2019 admin@magenx.com                                      #
 #        All rights reserved.                                                     #
 #=================================================================================#
 SELF=$(basename $0)
-MAGENX_VER="21.0.5"
+MAGENX_VER="21.0.6"
 MAGENX_BASE="https://magenx.sh"
 
 ###################################################################################
