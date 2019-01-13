@@ -1198,7 +1198,6 @@ sed -i "s,/var/www/html,${MAGE_WEB_ROOT_PATH},g" /etc/nginx/sites-available/mage
 
 MAGE_ADMIN_PATH=$(grep -Po "(?<='frontName' => ')\w*(?=')" ${MAGE_WEB_ROOT_PATH}/app/etc/env.php)
 sed -i "s/ADMIN_PLACEHOLDER/${MAGE_ADMIN_PATH}/" /etc/nginx/conf_m${MAGE_VERSION}/extra_protect.conf
-systemctl restart nginx.service
 echo
 GREENTXT "PHPMYADMIN INSTALLATION AND CONFIGURATION"
      PMA_FOLDER=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
@@ -1214,6 +1213,7 @@ GREENTXT "PHPMYADMIN INSTALLATION AND CONFIGURATION"
 	 	   
      htpasswd -b -c /etc/nginx/.mysql mysql ${PMA_PASSWD}  >/dev/null 2>&1
      echo
+     systemctl restart nginx.service
 cat >> /root/magenx/.magenx_index <<END
 pma   mysql_${PMA_FOLDER}   mysql   ${PMA_PASSWD}
 END
