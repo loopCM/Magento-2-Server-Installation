@@ -1175,6 +1175,8 @@ php_admin_value[memory_limit] = 1024M
 php_admin_value[date.timezone] = ${MAGE_TIMEZONE}
 END
 
+echo "${MAGE_WEB_ROOT_PATH}/app/etc/env.php" >> /etc/php.d/opcache-default.blacklist
+
 systemctl daemon-reload
 echo
 GREENTXT "NGINX SETTINGS"
@@ -1417,7 +1419,7 @@ rm -rf var/*
 su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento deploy:mode:set developer"
 su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento cache:flush"
 su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento cache:disable"
-sed -i "s/report/report|${OPCACHE_FILE}_opcache_gui/" /etc/nginx/sites-available/magento2.conf
+
 systemctl restart php-fpm.service
 echo
 curl -s -o /usr/local/bin/n98-magerun2 https://files.magerun.net/n98-magerun2.phar
