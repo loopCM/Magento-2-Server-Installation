@@ -1277,6 +1277,7 @@ GREENTXT "SYSTEM AUTO UPDATE WITH YUM-CRON"
 yum-config-manager --enable remi-php72 >/dev/null 2>&1
 yum-config-manager --enable remi >/dev/null 2>&1
 sed -i 's/apply_updates = no/apply_updates = yes/' /etc/yum/yum-cron.conf
+sed -i 's/emit_via = stdio/emit_via = email/' /etc/yum/yum-cron.conf
 sed -i "s/email_from = root@localhost/email_from = yum-cron@${MAGE_DOMAIN}/" /etc/yum/yum-cron.conf
 sed -i "s/email_to = root/email_to = ${MAGE_ADMIN_EMAIL}/" /etc/yum/yum-cron.conf
 systemctl enable yum-cron >/dev/null 2>&1
