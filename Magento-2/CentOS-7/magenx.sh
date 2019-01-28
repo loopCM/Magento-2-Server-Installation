@@ -1332,27 +1332,6 @@ RULEFILE="/tmp/rules.yar"
 /usr/bin/curl -s ${RULESURL} -o ${RULEFILE} && /usr/bin/mwscan --quiet --newonly --rules ${RULEFILE} ${MAGE_WEB_ROOT_PATH}
 END
 echo
-GREENTXT "MALDET MALWARE MONITOR WITH E-MAIL ALERTING"
-YELLOWTXT "warning: infected files will be moved to quarantine"
-cd /usr/local/src
-git clone https://github.com/rfxn/linux-malware-detect.git
-cd linux-malware-detect
-./install.sh > maldet-make-log-file 2>&1
-
-sed -i 's/email_alert="0"/email_alert="1"/' /usr/local/maldetect/conf.maldet
-sed -i "s/you@domain.com/${MAGE_ADMIN_EMAIL}/" /usr/local/maldetect/conf.maldet
-sed -i 's/quarantine_hits="0"/quarantine_hits="1"/' /usr/local/maldetect/conf.maldet
-sed -i 's/inotify_base_watches="16384"/inotify_base_watches="85384"/' /usr/local/maldetect/conf.maldet
-echo -e "${MAGE_WEB_ROOT_PATH%/*}\n\n/var/tmp/\n\n/tmp/" > /usr/local/maldetect/monitor_paths
-
-cp /usr/lib/systemd/system/maldet.service /etc/systemd/system/maldet.service
-sed -i "/^After.*/a OnFailure=service-status-mail@%n.service" /etc/systemd/system/maldet.service
-sed -i "/\[Install\]/i Restart=on-failure\nRestartSec=10\n" /etc/systemd/system/maldet.service
-systemctl daemon-reload
-
-sed -i "/^Example/d" /etc/clamd.d/scan.conf
-sed -i "/^Example/d" /etc/freshclam.conf
-sed -i "/^FRESHCLAM_DELAY/d" /etc/sysconfig/freshclam
 echo
 GREENTXT "GOACCESS REALTIME ACCESS LOG DASHBOARD"
 cd /usr/local/src
