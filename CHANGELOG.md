@@ -1,5 +1,10 @@
 # Change Log
 
+
+### RELEASE-21.0.7
+  * fixed mwscan magenx.sh#L1332
+  * minor code cleanup
+
 ### RELEASE-21.0.6
   
   * magento redis cache/session fix
