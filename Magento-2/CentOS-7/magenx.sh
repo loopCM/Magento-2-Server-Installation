@@ -1329,7 +1329,7 @@ MAILTO="${MAGE_ADMIN_EMAIL}"
 RULESURL="https://raw.githubusercontent.com/gwillem/magento-malware-scanner/master/build/all-confirmed.yar"
 RULEFILE="/tmp/rules.yar"
 
-/usr/bin/curl -s ${RULESURL} -o ${RULEFILE} && /usr/bin/mwscan --quiet --newonly --rules ${RULEFILE} ${MAGE_WEB_ROOT_PATH}
+/usr/bin/curl -s \${RULESURL} -o \${RULEFILE} && /usr/bin/mwscan --quiet --newonly --rules \${RULEFILE} ${MAGE_WEB_ROOT_PATH}
 END
 echo
 echo
