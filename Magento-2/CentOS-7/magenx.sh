@@ -1270,7 +1270,6 @@ echo
 GREENTXT "OPCACHE GUI, n98-MAGERUN, IMAGE OPTIMIZER, MYSQLTUNER, SSL DEBUG TOOLS"
      mkdir -p /opt/magento_saved_scripts
      wget -qO /opt/magento_saved_scripts/tlstest_$(openssl rand 2 -hex).php ${REPO_MAGENX_TMP}tlstest.php
-     wget -qO /usr/local/bin/wesley.pl ${REPO_MAGENX_TMP}wesley.pl
      wget -qO /usr/local/bin/mysqltuner ${MYSQL_TUNER}
 echo
 GREENTXT "SYSTEM AUTO UPDATE WITH YUM-CRON"
@@ -1353,8 +1352,10 @@ GREENTXT "MAGENTO CRONJOBS"
         echo "#* * * * * php -c /etc/php.ini ${MAGE_WEB_ROOT_PATH}/bin/magento setup:cron:run" >> magecron
 ##
 crontab -u ${MAGE_WEB_USER} magecron
+GREENTXT "ROOT CRONJOBS"
 echo "5 8 * * 7 perl /usr/local/bin/mysqltuner --nocolor 2>&1 | mailx -E -s \"MYSQLTUNER WEEKLY REPORT at ${HOSTNAME}\" ${MAGE_ADMIN_EMAIL}" >> rootcron
 echo "30 23 * * * cd /var/log/nginx/; goaccess access.log -a -o access_log_report.html 2>&1 && echo | mailx -s \"Daily access log report at ${HOSTNAME}\" -a access_log_report.html ${MAGE_ADMIN_EMAIL}" >> rootcron
+echo "0 1 * * 1 find ${MAGE_WEB_ROOT_PATH}/pub/ -name '*\.jpg' -type f -mtime -7 -exec jpegoptim -q -s -p --all-progressive -m 65 {} \; >/dev/null 2>&1" >> rootcron
 crontab rootcron
 rm magecron
 rm rootcron
