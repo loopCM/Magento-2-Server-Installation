@@ -1263,6 +1263,8 @@ if [ -f /etc/systemd/system/varnish.service ]; then
 GREENTXT "VARNISH CACHE SETTINGS"
     sed -i "s/MAGE_WEB_USER/${MAGE_WEB_USER}/g"  /etc/systemd/system/varnish.service
     systemctl enable varnish.service >/dev/null 2>&1
+    chmod u+x ${MAGE_WEB_ROOT_PATH}/bin/magento
+    php ${MAGE_WEB_ROOT_PATH}/bin/magento varnish:vcl:generate --export-version=5 --output-file=/etc/varnish/default.vcl
     systemctl restart varnish.service
     YELLOWTXT "VARNISH CACHE PORT :8081"
 fi
@@ -1365,7 +1367,6 @@ echo
 systemctl start redis.target
 ## cache backend
 cd ${MAGE_WEB_ROOT_PATH}
-chmod u+x bin/magento
 su ${MAGE_WEB_USER} -s /bin/bash -c "bin/magento setup:config:set \
 --cache-backend=redis \
 --cache-backend-redis-server=127.0.0.1 \
