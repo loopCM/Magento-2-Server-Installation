@@ -1661,7 +1661,7 @@ EOF
 yum -y -q install wazuh-manager
 echo
 GREENTXT "INSTALLATION OF WAZUH API + NODEJS"
-curl --silent --location https://rpm.nodesource.com/setup_6.x | bash >/dev/null 2>&1
+curl --silent --location https://rpm.nodesource.com/setup_8.x | bash >/dev/null 2>&1
 yum -y -q install nodejs
 yum -y -q install wazuh-api
 echo
@@ -1721,7 +1721,7 @@ echo
 echo
 GREENTXT "INSTALLATION OF KIBANA:"
 yum -y -q install kibana
-/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.2_6.5.4.zip
+/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.2_6.7.0.zip
 echo
 systemctl daemon-reload
 systemctl enable kibana.service
@@ -1729,6 +1729,7 @@ systemctl restart kibana.service
 echo
 echo
 yum-config-manager --disable elastic
+yum-config-manager --disable wazuh
 echo
 GREENTXT "OSSEC WAZUH API SETTINGS"
 sed -i 's/.*config.host.*/config.host = "127.0.0.1";/' /var/ossec/api/configuration/config.js
