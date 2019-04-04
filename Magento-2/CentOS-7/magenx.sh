@@ -174,12 +174,12 @@ fi
 
 # check if webstack is clean
 if ! grep -q "webstack_is_clean" /root/magenx/.webstack >/dev/null 2>&1 ; then
-installed_packages="$(rpm -qa --qf '%{name}\n' 'mysqld?|Percona*|maria*|php-?|nginx*|*ftp*|varnish*|certbot*|redis*|webmin')"
+installed_packages="$(rpm -qa --qf '%{name} ' 'mysqld?|Percona*|maria*|php-?|nginx*|*ftp*|varnish*|certbot*|redis*|webmin')"
   if [ ! -z "$installed_packages" ]; then
   REDTXT  "ERROR: WEBSTACK PACKAGES ALREADY INSTALLED"
   YELLOWTXT "------> YOU NEED TO REMOVE THEM OR RE-INSTALL MINIMAL OS VERSION"
   echo
-  echo "${installed_packages[@]}" | awk '{print "               ",$1}'
+  echo -e "\t\t yum remove ${installed_packages}"
   echo
   echo
   exit 1
