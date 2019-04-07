@@ -9,7 +9,7 @@ MAGENX_VER="21.0.7"
 MAGENX_BASE="https://magenx.sh"
 
 ###################################################################################
-###                       DEFINE LINKS AND PACKAGES STARTS                      ###
+###                            DEFINE LINKS AND PACKAGES                        ###
 ###################################################################################
 
 # Magento
@@ -63,7 +63,7 @@ BOLD="\e[1m"
 RESET="\e[0m"
 
 ###################################################################################
-###                            MESSAGES ECHO DESIGN                             ###
+###                            ECHO MESSAGES DESIGN                             ###
 ###################################################################################
 
 function WHITETXT() {
@@ -157,7 +157,7 @@ done }
 
 clear
 ###################################################################################
-###                                  START CHECKS                               ###
+###                                  START CHECKING                             ###
 ###################################################################################
 
 echo
@@ -220,7 +220,7 @@ fi
 		if [ "${update_agree}" == "y" ];then
 		mv MAGENX_NEW ${SELF}
 		echo
-                GREENTXT "THE FILE HAS BEEN UPGRADED, PLEASE RUN IT AGAIN"
+                GREENTXT "THE FILE WAS UPGRADED, PLEASE RUN IT AGAIN"
 		echo
                 exit 1
             else
@@ -333,7 +333,7 @@ echo
   WHITETXT "CPU frequency: $freq MHz"
   WHITETXT "Total amount of RAM: $tram MB"
   echo
-  WHITETXT "${BOLD}BENCHMARK RESULTS"
+  WHITETXT "${BOLD}BENCHMARKS RESULTS"
   WHITETXT "I/O speed: ${IO_COLOR}"
   WHITETXT "CPU Time: ${CPU_COLOR}"
 
@@ -364,15 +364,15 @@ if [ "${new_ssh_set}" == "y" ];then
    echo
       cp /etc/ssh/sshd_config /etc/ssh/sshd_config.BACK
       SSHPORT=$(shuf -i 9537-9554 -n 1)
-      read -e -p "---> Enter a new ssh port : " -i "${SSHPORT}" NEW_SSH_PORT
+      read -e -p "---> Enter the new ssh port : " -i "${SSHPORT}" NEW_SSH_PORT
       sed -i "s/.*Port 22/Port ${NEW_SSH_PORT}/g" /etc/ssh/sshd_config
      echo
-        GREENTXT "SSH PORT AND SETTINGS HAS BEEN UPDATED  -  OK"
+        GREENTXT "SSH PORT AND SETTINGS WERE UPDATED  -  OK"
         systemctl restart sshd.service
         ss -tlp | grep sshd
      echo
 echo
-REDTXT "!IMPORTANT: NOW OPEN A NEW SSH SESSION WITH THE NEW PORT!"
+REDTXT "!IMPORTANT: NOW OPEN A NEW SSH SESSION WITH A NEW PORT!"
 REDTXT "!IMPORTANT: DO NOT CLOSE THE CURRENT SESSION!"
 echo
 echo -n "------> Have you logged in another session? [y/n][n]:"
@@ -483,7 +483,7 @@ fi
 echo
 echo
 echo "-------------------------------------------------------------------------------------"
-BLUEBG "| START THE INSTALLATION OF REPOSITORIES AND PACKAGES |"
+BLUEBG "| INSTALLATION OF REPOSITORIES AND PACKAGES |"
 echo "-------------------------------------------------------------------------------------"
 echo
 WHITETXT "============================================================================="
@@ -501,7 +501,7 @@ if [ "${repo_percona_install}" == "y" ];then
       if [ "$?" = 0 ] # if repository installed then install package
         then
           echo
-            GREENTXT "REPOSITORY HAS BEEN INSTALLED  -  OK"
+            GREENTXT "REPOSITORY INSTALLED  -  OK"
               echo
               echo
               GREENTXT "Installation of Percona 5.7 database:"
@@ -515,7 +515,7 @@ if [ "${repo_percona_install}" == "y" ];then
         if [ "$?" = 0 ] # if package installed then configure
           then
             echo
-              GREENTXT "DATABASE HAS BEEN INSTALLED  -  OK"
+              GREENTXT "DATABASE INSTALLED  -  OK"
               echo
               ## plug in service status alert
               cp /usr/lib/systemd/system/mysqld.service /etc/systemd/system/mysqld.service
@@ -540,7 +540,8 @@ if [ "${repo_percona_install}" == "y" ];then
                 echo
               echo
               ## get mysql tools
-	      YELLOWTXT "INSTALL MYSQLTOP, PERCONA-TOOLKIT, MYSQLROUTER"
+	      YELLOWTXT "INSTALL MYSQLTOP, PERCONA-TOOLKIT, MYSQLROUTER, MYSQLTUNER"
+	      wget -qO /usr/local/bin/mysqltuner ${MYSQL_TUNER}
               cd /usr/local/src
               wget -qO - ${MYSQL_TOP} | tar -xzp && cd mytop*
               perl Makefile.PL && make && make install  >/dev/null 2>&1
@@ -583,7 +584,7 @@ gpgkey=file:///etc/pki/rpm-gpg/nginx_signing.key
 gpgcheck=1
 END
             echo
-            GREENTXT "REPOSITORY HAS BEEN INSTALLED  -  OK"
+            GREENTXT "REPOSITORY INSTALLED  -  OK"
             echo
             GREENTXT "Installation of nginx package:"
             echo
@@ -596,7 +597,7 @@ END
       if [ "$?" = 0 ]
         then
           echo
-            GREENTXT "NGINX HAS BEEN INSTALLED  -  OK"
+            GREENTXT "NGINX INSTALLED  -  OK"
             echo
             ## plug in service status alert
             cp /usr/lib/systemd/system/nginx.service /etc/systemd/system/nginx.service
@@ -633,7 +634,7 @@ if [ "${repo_remi_install}" == "y" ];then
       if [ "$?" = 0 ]
         then
           echo
-            GREENTXT "REPOSITORY HAS BEEN INSTALLED  -  OK"
+            GREENTXT "REPOSITORY INSTALLED  -  OK"
             echo
             GREENTXT "Installation of PHP 7.2:"
             echo
@@ -646,7 +647,7 @@ if [ "${repo_remi_install}" == "y" ];then
        if [ "$?" = 0 ]
          then
            echo
-             GREENTXT "PHP HAS BEEN INSTALLED  -  OK"
+             GREENTXT "PHP INSTALLED  -  OK"
              ## plug in service status alert
              cp /usr/lib/systemd/system/php-fpm.service /etc/systemd/system/php-fpm.service
              sed -i "s/PrivateTmp=true/PrivateTmp=false/" /etc/systemd/system/php-fpm.service
@@ -674,7 +675,7 @@ if [ "${repo_remi_install}" == "y" ];then
        if [ "$?" = 0 ]
          then
            echo
-             GREENTXT "REDIS HAS BEEN INSTALLED"
+             GREENTXT "REDIS INSTALLED"
              systemctl disable redis >/dev/null 2>&1
              echo
 cat > /etc/systemd/system/redis@.service <<END
@@ -754,7 +755,7 @@ fi
 echo
 WHITETXT "============================================================================="
 echo
-echo -n "---> Start Varnish cache installation? [y/n][n]:"
+echo -n "---> Start Varnish Cache installation? [y/n][n]:"
 read varnish_install
 if [ "${varnish_install}" == "y" ];then
 cat >> /etc/yum.repos.d/varnishcache_varnish52.repo <<END
@@ -793,7 +794,7 @@ echo
 	    wget -qO /etc/systemd/system/varnish.service ${REPO_MAGENX_TMP}varnish.service
             wget -qO /etc/varnish/varnish.params ${REPO_MAGENX_TMP}varnish.params
             systemctl daemon-reload >/dev/null 2>&1
-            GREENTXT "VARNISH 52 HAS BEEN INSTALLED  -  OK"
+            GREENTXT "VARNISH 52 INSTALLED  -  OK"
                else
               echo
             REDTXT "VARNISH INSTALLATION ERROR"
@@ -802,11 +803,6 @@ echo
           echo
             YELLOWTXT "Varnish installation was skipped by the user. Next step"
 fi
-echo
-echo
-echo "-------------------------------------------------------------------------------------"
-BLUEBG "| THE INSTALLATION OF REPOSITORIES AND PACKAGES IS COMPLETE |"
-echo "-------------------------------------------------------------------------------------"
 echo
 echo
 GREENTXT "NOW WE ARE GOING TO CONFIGURE EVERYTHING"
@@ -915,7 +911,7 @@ echo "*         hard    nofile          1000000" >> /etc/security/limits.conf
 echo
 echo
 echo "-------------------------------------------------------------------------------------"
-BLUEBG "| FINISHED PACKAGES INSTALLATION |"
+BLUEBG "| INSTALLATION OF REPOSITORIES AND PACKAGES IS COMPLETED |"
 echo "-------------------------------------------------------------------------------------"
 echo
 echo
@@ -1036,7 +1032,7 @@ printf "\033c"
 ;;
 
 ###################################################################################
-###                               MAGENTO IINSTALLATION                         ###
+###                               MAGENTO INSTALLATION                         ###
 ###################################################################################
 
 "install")
@@ -1260,7 +1256,7 @@ END
 fi
 echo
 if [ -f /etc/systemd/system/varnish.service ]; then
-GREENTXT "VARNISH CACHE SETTINGS"
+GREENTXT "VARNISH CACHE CONFIGURATION"
     sed -i "s/MAGE_WEB_USER/${MAGE_WEB_USER}/g"  /etc/systemd/system/varnish.service
     systemctl enable varnish.service >/dev/null 2>&1
     chmod u+x ${MAGE_WEB_ROOT_PATH}/bin/magento
@@ -1269,10 +1265,9 @@ GREENTXT "VARNISH CACHE SETTINGS"
     YELLOWTXT "VARNISH CACHE PORT :8081"
 fi
 echo
-GREENTXT "OPCACHE GUI, n98-MAGERUN, IMAGE OPTIMIZER, MYSQLTUNER, SSL DEBUG TOOLS"
+GREENTXT "DOWNLOADING n98-MAGERUN"
      mkdir -p /opt/magento_saved_scripts
-     wget -qO /opt/magento_saved_scripts/tlstest_$(openssl rand 2 -hex).php ${REPO_MAGENX_TMP}tlstest.php
-     wget -qO /usr/local/bin/mysqltuner ${MYSQL_TUNER}
+     curl -s -o /usr/local/bin/n98-magerun2 https://files.magerun.net/n98-magerun2.phar
 echo
 GREENTXT "SYSTEM AUTO UPDATE WITH YUM-CRON"
 yum-config-manager --enable remi-php72 >/dev/null 2>&1
@@ -1404,7 +1399,6 @@ su ${MAGE_WEB_USER} -s /bin/bash -c "php bin/magento cache:disable"
 
 systemctl restart php-fpm.service
 echo
-curl -s -o /usr/local/bin/n98-magerun2 https://files.magerun.net/n98-magerun2.phar
 GREENTXT "SAVING COMPOSER JSON AND LOCK"
 cp composer.json ../composer.json.saved
 cp composer.lock ../composer.lock.saved
