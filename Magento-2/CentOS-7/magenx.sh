@@ -1661,7 +1661,7 @@ yum -y -q install wazuh-api
 echo
 GREENTXT "INSTALLATION OF JAVA 8 JDK RPM:"
 cd /usr/local/src
-curl -Lo jre-8u202-linux-x64.rpm --header "Cookie: oraclelicense=accept-securebackup-cookie" "https://download.oracle.com/otn-pub/java/jdk/8u202-b08/1961070e4c9b4e26a04e7f5a083f551e/jre-8u202-linux-x64.rpm"
+wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "https://download.oracle.com/otn-pub/java/jdk/8u202-b08/1961070e4c9b4e26a04e7f5a083f551e/jre-8u202-linux-x64.rpm"
 yum -y localinstall jre-8u202-linux-x64.rpm
 echo
 echo
