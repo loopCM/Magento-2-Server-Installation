@@ -1217,6 +1217,8 @@ pma   mysql_${PMA_FOLDER}   mysql   ${PMA_PASSWD}
 END
 echo
 GREENTXT "PROFTPD CONFIGURATION"
+     wget -qO /usr/local/bin/ftpasswd https://raw.githubusercontent.com/proftpd/proftpd/master/contrib/ftpasswd
+     chmod +x /usr/local/bin/ftpasswd
      wget -qO /etc/proftpd.conf ${REPO_MAGENX_TMP}proftpd.conf
      ## change proftpd config
      SERVER_IP_ADDR=$(ip route get 1 | awk '{print $NF;exit}')
