@@ -930,8 +930,8 @@ BLUEBG "|   DOWNLOAD MAGENTO ${MAGE_VERSION} (${MAGE_VERSION_FULL})             
 echo "-------------------------------------------------------------------------------------"
 echo
 echo
-     read -e -p "---> ENTER YOUR DOMAIN NAME OR IP ADDRESS: " -i "myshop.com" MAGE_DOMAIN
-     read -e -p "---> ENTER MAGENTO / FTP USER NAME: " -i "myshop" MAGE_WEB_USER
+     read -e -p "---> ENTER YOUR DOMAIN OR IP ADDRESS: " -i "myshop.com" MAGE_DOMAIN
+     read -e -p "---> ENTER MAGENTO FILES USER NAME: " -i "myshop" MAGE_WEB_USER
      MAGE_WEB_ROOT_PATH="/home/${MAGE_WEB_USER}/public_html"
      echo
 	 echo "---> MAGENTO ${MAGE_VERSION} (${MAGE_VERSION_FULL})"
@@ -1219,6 +1219,10 @@ echo
 GREENTXT "PROFTPD CONFIGURATION"
      wget -qO /usr/local/bin/ftpasswd https://raw.githubusercontent.com/proftpd/proftpd/master/contrib/ftpasswd
      chmod +x /usr/local/bin/ftpasswd
+     MAGE_SUPPORT_USER_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
+     MAGE_SUPPORT_USER_ID=$(id -u ${MAGE_WEB_USER})
+     echo "${MAGE_SUPPORT_USER_PASS}" | ftpasswd --uid ${MAGE_SUPPORT_USER_ID} --gid ${MAGE_SUPPORT_USER_ID} --name ${MAGE_WEB_USER}ftp --shell /bin/false --home ${MAGE_WEB_ROOT_PATH} --stdin --passwd --file=/etc/.ftpd.passwd
+     chmod 640 /etc/.ftpd.passwd
      wget -qO /etc/proftpd.conf ${REPO_MAGENX_TMP}proftpd.conf
      ## change proftpd config
      SERVER_IP_ADDR=$(ip route get 1 | awk '{print $NF;exit}')
@@ -1435,8 +1439,10 @@ WHITETXT "[mysql root pass]: ${MYSQL_ROOT_PASS}"
 WHITETXT "[mysql-router port]:" ${ROUTER_PORT}
 echo
 WHITETXT "[ftp port]: ${FTP_PORT}"
-WHITETXT "[ftp user]: ${MAGE_WEB_USER}"
-WHITETXT "[ftp password]: ${MAGE_WEB_USER_PASS}"
+WHITETXT "[ftp master user]: ${MAGE_WEB_USER}"
+WHITETXT "[ftp master user password]: ${MAGE_WEB_USER_PASS}"
+WHITETXT "[ftp support user]: ${MAGE_WEB_USER}ftp"
+WHITETXT "[ftp support user password]: ${MAGE_SUPPORT_USER_PASS}"
 WHITETXT "[ftp allowed geoip]: ${USER_GEOIP}"
 WHITETXT "[ftp allowed ip]: ${USER_IP}"
 echo
