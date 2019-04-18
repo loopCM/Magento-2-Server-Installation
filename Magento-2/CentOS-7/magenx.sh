@@ -1221,7 +1221,7 @@ GREENTXT "PROFTPD CONFIGURATION"
      chmod +x /usr/local/bin/ftpasswd
      MAGE_SUPPORT_USER_PASS=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&?=+_[]{}()<>-' | fold -w 15 | head -n 1)
      MAGE_SUPPORT_USER_ID=$(id -u ${MAGE_WEB_USER})
-     echo "${MAGE_SUPPORT_USER_PASS}" | ftpasswd --uid ${MAGE_SUPPORT_USER_ID} --gid ${MAGE_SUPPORT_USER_ID} --name ${MAGE_WEB_USER}ftp --shell /bin/false --home ${MAGE_WEB_ROOT_PATH} --stdin --passwd --file=/etc/.ftpd.passwd
+     echo "${MAGE_SUPPORT_USER_PASS}" | ftpasswd --uid ${MAGE_SUPPORT_USER_ID} --gid ${MAGE_SUPPORT_USER_ID} --name ${MAGE_WEB_USER}ftp --shell /bin/false --home ${MAGE_WEB_ROOT_PATH} --stdin --passwd --file=/etc/.ftpd.passwd  >/dev/null 2>&1
      chmod 640 /etc/.ftpd.passwd
      wget -qO /etc/proftpd.conf ${REPO_MAGENX_TMP}proftpd.conf
      ## change proftpd config
